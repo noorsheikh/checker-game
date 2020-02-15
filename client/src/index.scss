@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800&display=swap');
+// font-family: 'Open Sans', sans-serif;
+
+$body-bg: #ffffff;
+$primary: #7a6a53;
+$secondary: #948c75;
+$font-family-sans-serif: "Open Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-size-base: 1rem;
+
+@import "./App.scss";

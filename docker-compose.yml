@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    volumes:
+      - ./client:/client
+    ports:
+      - 3000:3000
+    depends_on:
+      - server
+    networks:
+      checker_game:
+
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    # command: bash -c
+    #   "
+    #     php bin/console make:migration &&
+    #     php bin/console doctrine:migrations:migrate
+    #   "
+    volumes:
+      - ./server:/var/www/html/
+    ports:
+      - 80:80
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    networks:
+      checker_game:
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: checker_game
+    networks:
+      checker_game:
+
+networks:
+  checker_game:
