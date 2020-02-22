@@ -17,11 +17,6 @@ services:
     build:
       context: .
       dockerfile: ./server/Dockerfile
-    # command: bash -c
-    #   "
-    #     php bin/console make:migration &&
-    #     php bin/console doctrine:migrations:migrate
-    #   "
     volumes:
       - ./server:/var/www/html/
     ports:
