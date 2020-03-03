@@ -4,8 +4,12 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
-    #volumes:
-      #- ./client:/client/
+    volumes:
+      - ./client/src/:/client/src/
+      - ./client/public/:/client/public/
+      - ./client/package.json:/client/package.json
+      - ./client/yarn.lock:/client/yarn.lock
+      - ./client/tsconfig.json:/client/tsconfig.json
     ports:
       - 3000:3000
     depends_on:
@@ -18,7 +22,12 @@ services:
       context: .
       dockerfile: ./server/Dockerfile
     volumes:
-      - ./server:/var/www/html/
+      - ./server/config/:/var/www/html/config/
+      - ./server/src/:/var/www/html/src/
+      - ./server/.env:/var/www/html/.env
+      - ./server/composer.json:/var/www/html/composer.json
+      - ./server/composer.lock:/var/www/html/composer.lock
+      - ./server/symfony.lock:/var/www/html/symfony.lock
     ports:
       - 80:80
     depends_on:
