@@ -18,7 +18,7 @@ React/Redux with Typescript Frontend
 
 ## Local Development Environment Setup (both Server and Client Side)
 
-In order to setup local docker environment make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed locally.
+In order to setup local docker environment make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop) installed locally. Use Docker ToolBox if there are restrictions related to Windows license.[Docker ToolBox]https://docs.docker.com/toolbox/toolbox_install_windows/
 
 Note: all below commands need to be execute from the source code root directory.
 
