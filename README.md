@@ -28,6 +28,9 @@ Note: all below commands need to be execute from the source code root directory.
 ### Launch Docker Containers
 ```docker-compose up``` if need to launch in deteched mode append `-d` to the end of the command
 
+### Troubleshoot Info
+If you are using Windows Docker Toolbox, make sure that the VirtualBox has write permissions for the specific drive where you want to clone the repository. If you use C drive, it won't have any problems. 
+
 ### Stop Running Containers
 ```docker-compose down```
 
