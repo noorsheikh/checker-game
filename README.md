@@ -41,3 +41,7 @@ If you want to build image and launch containers in with terminal command
 ### Local Browser URL
 After spinning the containers use this url [http://localhost:3000/](http://localhost:3000/) to access UI dashboard in browser.
 
+### Windows Local Browser URL
+After contains are up, use the command below to get the IP address to use with the exposed port (192.168.99.100:3000).
+```docker-machine ip```
+
