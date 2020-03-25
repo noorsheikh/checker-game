@@ -43,6 +43,12 @@ class User
   private $password;
 
   /**
+   * @ORM\ManyToOne(targetEntity="Checker\Entity\UserStatus")
+   * @ORM\JoinColumn(nullable=false)
+   */
+  private $status;
+
+  /**
    * Get the value of id
    *
    * @return int
@@ -170,5 +176,17 @@ class User
     $this->password = $password;
 
     return $this;
+  }
+
+  public function getStatus(): ?UserStatus
+  {
+      return $this->status;
+  }
+
+  public function setStatus(?UserStatus $status): self
+  {
+      $this->status = $status;
+
+      return $this;
   }
 }
