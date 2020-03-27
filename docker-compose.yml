@@ -16,7 +16,7 @@ services:
       - server
     networks:
       checker_game:
-
+    tty: true
   server:
     build:
       context: .
