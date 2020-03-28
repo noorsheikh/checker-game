@@ -25,17 +25,17 @@ class GameUsers
     private $game;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Checker\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
      */
     private $player1;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Checker\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
      */
     private $player2;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Checker\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
      */
     private $winner;
 
