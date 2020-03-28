@@ -17,47 +17,52 @@ class GameMoves
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\Games")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\Game", inversedBy="gameMoves")
      * @ORM\JoinColumn(nullable=false)
      */
     private $game;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User", inversedBy="gameMoves")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $player;
+    private $user;
 
     /**
      * @ORM\Column(type="string", length=64)
      */
     private $state;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $timestamp;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getGame(): ?Games
+    public function getGame(): ?Game
     {
         return $this->game;
     }
 
-    public function setGame(?Games $game): self
+    public function setGame(?Game $game): self
     {
         $this->game = $game;
 
         return $this;
     }
 
-    public function getPlayer(): ?User
+    public function getUser(): ?User
     {
-        return $this->player;
+        return $this->user;
     }
 
-    public function setPlayer(?User $player): self
+    public function setUser(?User $user): self
     {
-        $this->player = $player;
+        $this->user = $user;
 
         return $this;
     }
@@ -70,6 +75,18 @@ class GameMoves
     public function setState(string $state): self
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getTimestamp(): ?\DateTimeInterface
+    {
+        return $this->timestamp;
+    }
+
+    public function setTimestamp(\DateTimeInterface $timestamp): self
+    {
+        $this->timestamp = $timestamp;
 
         return $this;
     }

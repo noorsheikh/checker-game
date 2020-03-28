@@ -2,6 +2,8 @@
 
 namespace Checker\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -17,75 +19,124 @@ class GameUsers
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\Games")
+     * @ORM\OneToOne(targetEntity="Checker\Entity\Game", inversedBy="gameUsers", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $game;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
+     * @ORM\ManyToMany(targetEntity="Checker\Entity\User")
      */
     private $player1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
+     * @ORM\ManyToMany(targetEntity="Checker\Entity\User")
      */
     private $player2;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
+     * @ORM\ManyToMany(targetEntity="Checker\Entity\User")
      */
     private $winner;
+
+    public function __construct()
+    {
+        $this->player1 = new ArrayCollection();
+        $this->player2 = new ArrayCollection();
+        $this->winner = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getGame(): ?Games
+    public function getGame(): ?Game
     {
         return $this->game;
     }
 
-    public function setGame(?Games $game): self
+    public function setGame(Game $game): self
     {
         $this->game = $game;
 
         return $this;
     }
 
-    public function getPlayer1(): ?User
+    /**
+     * @return Collection|User[]
+     */
+    public function getPlayer1(): Collection
     {
         return $this->player1;
     }
 
-    public function setPlayer1(?User $player1): self
+    public function addPlayer1(User $player1): self
     {
-        $this->player1 = $player1;
+        if (!$this->player1->contains($player1)) {
+            $this->player1[] = $player1;
+        }
 
         return $this;
     }
 
-    public function getPlayer2(): ?User
+    public function removePlayer1(User $player1): self
+    {
+        if ($this->player1->contains($player1)) {
+            $this->player1->removeElement($player1);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getPlayer2(): Collection
     {
         return $this->player2;
     }
 
-    public function setPlayer2(?User $player2): self
+    public function addPlayer2(User $player2): self
     {
-        $this->player2 = $player2;
+        if (!$this->player2->contains($player2)) {
+            $this->player2[] = $player2;
+        }
 
         return $this;
     }
 
-    public function getWinner(): ?User
+    public function removePlayer2(User $player2): self
+    {
+        if ($this->player2->contains($player2)) {
+            $this->player2->removeElement($player2);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getWinner(): Collection
     {
         return $this->winner;
     }
 
-    public function setWinner(?User $winner): self
+    public function addWinner(User $winner): self
     {
-        $this->winner = $winner;
+        if (!$this->winner->contains($winner)) {
+            $this->winner[] = $winner;
+        }
+
+        return $this;
+    }
+
+    public function removeWinner(User $winner): self
+    {
+        if ($this->winner->contains($winner)) {
+            $this->winner->removeElement($winner);
+        }
 
         return $this;
     }

@@ -17,7 +17,7 @@ class GameStatus
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=20)
+     * @ORM\Column(type="string", length=30)
      */
     private $status;
 
