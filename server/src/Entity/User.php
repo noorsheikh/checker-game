@@ -2,6 +2,8 @@
 
 namespace Checker\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -41,6 +43,22 @@ class User
    * @ORM\Column(type="string", length=100, nullable=false)
    */
   private $password;
+
+  /**
+   * @ORM\ManyToOne(targetEntity="Checker\Entity\UserStatus")
+   * @ORM\JoinColumn(nullable=false)
+   */
+  private $status;
+
+  /**
+   * @ORM\OneToMany(targetEntity="Checker\Entity\GameMoves", mappedBy="user")
+   */
+  private $gameMoves;
+
+  public function __construct()
+  {
+      $this->gameMoves = new ArrayCollection();
+  }
 
   /**
    * Get the value of id
@@ -170,5 +188,48 @@ class User
     $this->password = $password;
 
     return $this;
+  }
+
+  public function getStatus(): ?UserStatus
+  {
+      return $this->status;
+  }
+
+  public function setStatus(?UserStatus $status): self
+  {
+      $this->status = $status;
+
+      return $this;
+  }
+
+  /**
+   * @return Collection|GameMoves[]
+   */
+  public function getGameMoves(): Collection
+  {
+      return $this->gameMoves;
+  }
+
+  public function addGameMove(GameMoves $gameMove): self
+  {
+      if (!$this->gameMoves->contains($gameMove)) {
+          $this->gameMoves[] = $gameMove;
+          $gameMove->setUser($this);
+      }
+
+      return $this;
+  }
+
+  public function removeGameMove(GameMoves $gameMove): self
+  {
+      if ($this->gameMoves->contains($gameMove)) {
+          $this->gameMoves->removeElement($gameMove);
+          // set the owning side to null (unless already changed)
+          if ($gameMove->getUser() === $this) {
+              $gameMove->setUser(null);
+          }
+      }
+
+      return $this;
   }
 }
