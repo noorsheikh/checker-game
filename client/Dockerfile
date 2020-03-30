@@ -4,6 +4,7 @@ WORKDIR /client/
 
 COPY ./client/ /client/
 
+RUN yarn upgrade
 RUN yarn install
 
 EXPOSE 3000
