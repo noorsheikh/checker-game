@@ -1,10 +1,11 @@
 import React from 'react';
+import GameBoard from './GameBoard/GameBoard';
 
 class App extends React.Component<{}, {}> {
   render() {
     return (
       <React.Fragment>
-        Checker Game Client Side
+        <GameBoard/>
       </React.Fragment>
     )
   }
