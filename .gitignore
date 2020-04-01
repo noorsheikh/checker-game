@@ -1,3 +1,4 @@
 server/var/
 server/vendor/
 client/node_modules/
+.idea

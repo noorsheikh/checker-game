@@ -22,7 +22,7 @@ class UserStatus
     private $status;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(columnDefinition="timestamp default CURRENT_TIMESTAMP")
      */
     private $timestamp;
 
