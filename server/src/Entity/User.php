@@ -53,12 +53,6 @@ class User implements UserInterface
   private $password;
 
   /**
-   * @ORM\ManyToOne(targetEntity="Checker\Entity\UserStatus")
-   * @ORM\JoinColumn(nullable=false)
-   */
-  private $status;
-
-  /**
    * @ORM\OneToMany(targetEntity="Checker\Entity\GameMoves", mappedBy="user")
    */
   private $gameMoves;
@@ -220,18 +214,6 @@ class User implements UserInterface
     $this->password = $password;
 
     return $this;
-  }
-
-  public function getStatus(): ?UserStatus
-  {
-      return $this->status;
-  }
-
-  public function setStatus(?UserStatus $status): self
-  {
-      $this->status = $status;
-
-      return $this;
   }
 
   /**

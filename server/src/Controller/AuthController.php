@@ -3,8 +3,6 @@
 namespace Checker\Controller;
 
 use Checker\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,18 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/api")
  */
-class AuthController extends AbstractController
+class AuthController extends BaseController
 {
-  /**
-   * @var UserPasswordEncoderInterface
-   */
-  private $passwordEncoder;
-
-  public function __construct(UserPasswordEncoderInterface $passwordEncoder)
-  {
-    $this->passwordEncoder = $passwordEncoder;
-  }
-
   /**
    * @Route("/login", name="login")
    */
@@ -47,7 +35,7 @@ class AuthController extends AbstractController
       return $this->json([ 'message' => 'User password is not matching, please try again.' ]);
     }
 
-    $token = $this->get('lexik_jwt_authentication.encoder')->encode([
+    $token = $this->jwtEncoder->encode([
       'username' => $username,
       'firstname' => $user->getFirstName(),
       'lastname' => $user->getLastName()

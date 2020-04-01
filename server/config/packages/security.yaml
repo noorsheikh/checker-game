@@ -2,7 +2,7 @@ security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     encoders:
         Checker\Entity\User:
-            algorithm: auto
+            algorithm: argon2i
     providers:
         database_users:
             entity:
@@ -19,7 +19,7 @@ security:
                 failure_handler:          lexik_jwt_authentication.handler.authentication_failure
                 require_previous_session: false
         api:
-            pattern:   ^/api
+            pattern:   ^/api/secure/
             stateless: true
             guard:
                 authenticators:
@@ -40,6 +40,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/user/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/secure/,       roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

@@ -1,4 +1,7 @@
 server/var/
 server/vendor/
+server/src/Migrations/
+server/config/jwt/
+server/.env
 client/node_modules/
 .idea
