@@ -6,10 +6,11 @@
   ☐ Create Entities
   ☐ Integrate game board
 ☐ Noor
-  ☐ Create User Login Endpoint
-  ☐ Create User Logout Endpoint
-  ☐ Create User Registration Endpoint
+  ✔ Create User Login Endpoint @done (3/31/2020, 10:36:34 PM)
+  ✔ Create User Registration Endpoint @done (3/31/2020, 10:36:35 PM)
+  ✔ Setup Password Encoder @done (3/31/2020, 10:36:55 PM)
 
 
 
 Create a new task Ctrl + Enter
+Mark task a done Alt + D

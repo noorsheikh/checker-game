@@ -29,7 +29,7 @@ Note: all below commands need to be execute from the source code root directory.
 ```docker-compose up``` if need to launch in deteched mode append `-d` to the end of the command
 
 ### Troubleshoot Info
-If you are using Windows Docker Toolbox, make sure that the VirtualBox has write permissions for the specific drive where you want to clone the repository. If you use C drive, it won't have any problems. 
+If you are using Windows Docker Toolbox, make sure that the VirtualBox has write permissions for the specific drive where you want to clone the repository. If you use C drive, it won't have any problems.
 
 ### Stop Running Containers
 ```docker-compose down```
@@ -45,3 +45,10 @@ After spinning the containers use this url [http://localhost:3000/](http://local
 After contains are up, use the command below to get the IP address to use with the exposed port (192.168.99.100:3000).
 ```docker-machine ip```
 
+## Backend Endpoints
+Base Url: http://localhost:80
+
+| Endpoint URI        | Method           | Description  |
+| ------------- |-------------| -----|
+| /api/login      | POST | This endponint is used for user login |
+| /api/user/register      | POST      |   This endpoint is used for registering new user |

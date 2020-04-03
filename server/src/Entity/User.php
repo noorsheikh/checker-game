@@ -5,12 +5,18 @@ namespace Checker\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="Checker\Repository\UserRepository")
  * @ORM\Table(name="user")
+ * @UniqueEntity(
+ *  fields = "username",
+ *  message = "User already exist with provided username, please try again with another username."
+ * )
  */
-class User
+class User implements UserInterface
 {
   /**
    * @ORM\Id
@@ -39,16 +45,12 @@ class User
    */
   private $email;
 
+  private $plainPassword;
+
   /**
    * @ORM\Column(type="string", length=100, nullable=false)
    */
   private $password;
-
-  /**
-   * @ORM\ManyToOne(targetEntity="Checker\Entity\UserStatus")
-   * @ORM\JoinColumn(nullable=false)
-   */
-  private $status;
 
   /**
    * @ORM\OneToMany(targetEntity="Checker\Entity\GameMoves", mappedBy="user")
@@ -167,6 +169,30 @@ class User
   }
 
   /**
+   * Get the value of plainPassword
+   *
+   * @return string
+   */
+  public function getPlainPassword(): string
+  {
+    return $this->plainPassword;
+  }
+
+  /**
+   * Set the value of plainPassword
+   *
+   * @var string $plainPassword
+   *
+   * @return  self
+   */
+  public function setPlainPassword(string $plainPassword): self
+  {
+    $this->plainPassword = $plainPassword;
+
+    return $this;
+  }
+
+  /**
    * Get the value of password
    *
    * @return string
@@ -188,18 +214,6 @@ class User
     $this->password = $password;
 
     return $this;
-  }
-
-  public function getStatus(): ?UserStatus
-  {
-      return $this->status;
-  }
-
-  public function setStatus(?UserStatus $status): self
-  {
-      $this->status = $status;
-
-      return $this;
   }
 
   /**
@@ -231,5 +245,34 @@ class User
       }
 
       return $this;
+  }
+
+  /**
+   * Get the value of roles
+   *
+   * @return array|null
+   */
+  public function getRoles(): ?array
+  {
+    return [];
+  }
+
+  /**
+   * Not needed but it was available in the UserInterface
+   *
+   * @return void
+   */
+  public function eraseCredentials(): void
+  {
+  }
+
+  /**
+   * Not needed but it was available in the UserInterface
+   *
+   * @return null
+   */
+  public function getSalt()
+  {
+    return null;
   }
 }
