@@ -1,75 +1,73 @@
 // GAMEBOARD HTML FROM: https://github.com/codethejason/checkers/blob/master/index.html
 
-import React from 'react';
+import King1 from './img/king1.png';
+import King2 from './img/king2.png';
 import PropTypes from 'prop-types';
+import React from 'react';
+
 import './style.scss';
 
-var boardState = [
-    [0, 1, 0, 1, 0, 1, 0, 1],
-    [1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 1, 0, 1, 0, 1, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [2, 0, 2, 0, 2, 0, 2, 0],
-    [0, 2, 0, 2, 0, 2, 0, 2],
-    [2, 0, 2, 0, 2, 0, 2, 0]
-];
+const DEBUG = true;
+const dictionary = ["0vmin", "10vmin", "20vmin", "30vmin", "40vmin", "50vmin", "60vmin", "70vmin", "80vmin", "90vmin"];
 
-var tiles = [];
-var pieces = [];
-
-var dictionary = ["0vmin", "10vmin", "20vmin", "30vmin", "40vmin", "50vmin", "60vmin", "70vmin", "80vmin", "90vmin"];
-
-var playerTurn = 1;
-
-class Stats extends React.Component {
-    static propTypes = {
-        player1: PropTypes.string,
-        player2: PropTypes.string
-    };
-
-    constructor(props)
-    {
-        super(props);
-
-        this.player1 = this.props.player1;
-        this.player2 = this.props.player2;
-    }
-    
-    render()
-    {
-        return (
-            <div className="stats">
-                <h2>Game Statistics</h2>
-                <div className="wrapper">
-                    <div id="player1">
-                        <h3>{this.props.player1 + " (Top)"}</h3>
-                    </div>
-                    <div id="player2">
-                        <h3>{this.props.player2 + " (Bottom)"}</h3>
-                    </div>
-                </div>
-                <div className="turn"/>
-            </div>
-        )
-    }
+function dist(x1, y1, x2, y2)
+{
+    return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 }
 
-class Info extends React.Component {
-    render()
+function Stats(props)
+{
+    var turnBackground = "linear-gradient(to right, transparent 50%, #BEEE62 50%)";
+    if (props.playerTurn === 1)
     {
-        return (
-            <div className="info">
-                <h1>Checkers</h1>
-                <hr />
-            </div>
-        )
+        turnBackground = "linear-gradient(to right, #BEEE62 50%, transparent 50%)";
     }
+
+    var turnStyle = {
+        background: turnBackground
+    }
+    
+    return (
+    <div className="stats">
+        <h2>Game Statistics</h2>
+        <div className="wrapper">
+            <div id="player1">
+                <h3>{props.player1 + " (Top)"}</h3>
+            </div>
+            <div id="player2">
+                <h3>{props.player2 + " (Bottom)"}</h3>
+            </div>
+        </div>
+        <div className="turn" style={turnStyle}/>
+    </div>);
+}
+
+function Info()
+{
+    return (
+        <div className="info">
+            <h1>Checkers</h1>
+            <hr />
+        </div>
+    );
+}
+
+function Pieces(props) {
+    return (
+        <div className="pieces">
+            <div className="player1pieces">
+                {[props.player1pieces]}
+            </div>
+            <div className="player2pieces">
+                {[props.player2pieces]}
+            </div>
+        </div>
+    );
 }
 
 class Tile extends React.Component {
     static propTypes = {
-        position: PropTypes.object
+        position: PropTypes.object.isRequired
     };
 
     constructor(props)
@@ -87,117 +85,53 @@ class Tile extends React.Component {
         };
         
         return (
-            <div className="tile" style={style}/>
-        )
-    }
-}
-
-class Tiles extends React.Component {
-    render()
-    {
-        return (
-            [tiles]
+            <div className="tile" style={style} onClick={()=> this.props.handleClick(this.props.position)}/>
         )
     }
 }
 
 class Piece extends React.Component {
     static propTypes = {
-        king: PropTypes.bool,
-        player: PropTypes.number,
-        position: PropTypes.object
+        king: PropTypes.bool.isRequired,
+        player: PropTypes.number.isRequired,
+        playerTurn: PropTypes.number.isRequired,
+        position: PropTypes.object.isRequired,
+        selected: PropTypes.bool.isRequired
     };
 
     constructor(props)
     {
         super(props);
 
-        this.king = this.props.king;
-        this.player = this.props.player;
-        this.position = this.props.position;
-        
-        this.state = {
-            selected: false
-        };
-
         this.onClick = this.onClick.bind(this);
-    }
-
-    toggleSelected()
-    {
-        this.setState({selected: !this.state.selected});
     }
 
     onClick()
     {
-        if (playerTurn === this.player)
-        {
-            this.toggleSelected();
-        }
+        this.props.handleClick(this.props.player, this.props.position, this.props.king);
     }
 
     render()
     {
         var style = {
-            top: dictionary[this.position.row],
-            left: dictionary[this.position.column]
+            top: dictionary[this.props.position.row],
+            left: dictionary[this.props.position.column]
         };
 
         var className = "piece";
-        if (this.state.selected) className = "piece selected";
+        if (this.props.selected && this.props.playerTurn === this.props.player)
+        {
+            className += " selected";
+        }
+
+        if (this.props.king)
+        {
+            if (this.props.player === 1) style.backgroundImage = 'url(' + King1 + ')';
+            else if (this.props.player === 2) style.backgroundImage = 'url(' + King2 + ')';
+        }
         
         return (
             <div className={className} style={style} onClick={this.onClick}/>
-        )
-    }
-}
-
-class PlayerPieces extends React.Component {
-    static propTypes = {
-        pieces: PropTypes.array
-    }
-    
-    render()
-    {
-        return (
-            [this.props.pieces]
-        )
-    }
-}
-
-class Pieces extends React.Component {
-    constructor()
-    {
-        super();
-
-        this.player1pieces = [];
-        this.player2pieces = [];
-
-        for (var idx in pieces)
-        {
-            var piece = pieces[idx];
-            if (piece.props.player === 1)
-            {
-                this.player1pieces.push(piece);
-            }
-            else if (piece.props.player === 2)
-            {
-                this.player2pieces.push(piece);
-            }
-        }
-    }
-    
-    render ()
-    {
-        return (
-            <div className="pieces">
-                <div className="player1pieces">
-                    <PlayerPieces pieces={this.player1pieces}/>
-                </div>
-                <div className="player2pieces">
-                    <PlayerPieces pieces={this.player2pieces}/>
-                </div>
-            </div>
         )
     }
 }
@@ -207,6 +141,158 @@ class Board extends React.Component {
     {
         super();
 
+        this.state = {
+            boardState: [
+                [0, 1, 0, 1, 0, 1, 0, 1],
+                [1, 0, 1, 0, 1, 0, 1, 0],
+                [0, 1, 0, 1, 0, 1, 0, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [2, 0, 2, 0, 2, 0, 2, 0],
+                [0, 2, 0, 2, 0, 2, 0, 2],
+                [2, 0, 2, 0, 2, 0, 2, 0]],
+            playerTurn: 1,
+            selectedPiece: undefined
+        }
+
+        this.onTileClick = this.onTileClick.bind(this);
+        this.onPieceClick = this.onPieceClick.bind(this);
+    }
+
+    tick()
+    {
+        // TODO: Pull game board state from server and update state
+    }
+    
+    componentDidMount()
+    {
+        this.interval = setInterval(() => this.tick(), 1000);
+    }
+
+    componentWillUnmount()
+    {
+        clearInterval(this.interval);
+    }
+
+    isValidPlaceToMove(position)
+    {
+        var row = position.row;
+        var column = position.column;
+        if (row < 0 || row > 7 || column < 0 || column > 7) return false;
+        if (this.state.boardState[row][column] === 0) {
+            if (DEBUG) console.log("isValidPlaceToMove:true");
+            return true;
+        }
+        return false;
+    }
+
+    makeKing(position)
+    {
+        var boardState = this.state.boardState;
+        if (boardState[position.row][position.column] === 1)
+        {
+            boardState[position.row][position.column] = 3;
+        }
+        else if (boardState[position.row][position.column] === 2)
+        {
+            boardState[position.row][position.column] = 4;
+        }
+        this.setState({ boardState: boardState });
+    }
+
+    getBoardValue(selectedPiece)
+    {
+        if (selectedPiece !== undefined)
+        {
+            if (selectedPiece.king)
+            {
+                if (selectedPiece.player === 1)
+                {
+                    return 3;
+                }
+                else if (selectedPiece.player === 2)
+                {
+                    return 4;
+                }
+            }
+            else
+            {
+                return selectedPiece.player;
+            }
+        }
+    }
+
+    toggleTurn()
+    {
+        this.setState({ playerTurn: (this.state.playerTurn === 1) ? 2 : 1 });
+        // TODO: check if jump exists
+    }
+
+    movePiece(tilePosition)
+    {
+        var selectedPiece = this.state.selectedPiece;
+        var boardState = this.state.boardState;
+
+        if (selectedPiece)
+        {
+            if (selectedPiece.player !== this.state.playerTurn) return;
+
+            //make sure piece doesn't go backwards if it's not a king
+            if (selectedPiece.player === 1 && selectedPiece.king === false) {
+                if (tilePosition.row < selectedPiece.position.row) return false;
+            } else if (selectedPiece.player === 2 && selectedPiece.king === false) {
+                if (tilePosition.row > selectedPiece.position.row) return false;
+            }
+            //remove the mark from board and put it in the new spot
+            boardState[selectedPiece.position.row][selectedPiece.position.column] = 0;
+
+            if (selectedPiece.king)
+            {
+                boardState[tilePosition.row][tilePosition.column] = this.getBoardValue(selectedPiece);
+
+            }
+            else
+            {
+                boardState[tilePosition.row][tilePosition.column] = selectedPiece.player;
+            }
+            this.setState({ boardState: boardState });
+            //if piece reaches the end of the row on opposite side crown it a king (can move all directions)
+            if (!selectedPiece.king && (selectedPiece.position.row === 0 || selectedPiece.position.row === 7))
+                this.makeKing(tilePosition);
+
+            this.toggleTurn();
+        }
+    }
+
+    onTileClick(tilePosition)
+    {
+        if (DEBUG) console.log("onTileClick:" + JSON.stringify({tilePosition}));
+        if (!this.isValidPlaceToMove(tilePosition)) return;
+        this.movePiece(tilePosition);
+    }
+
+    onPieceClick(player, position, king)
+    {
+        if (DEBUG) console.log("onPieceClick:" + JSON.stringify({player, position, king}));
+
+        this.setState({ selectedPiece: {player: player, position: position, king: king} });
+        if (this.state.selectedPiece !== undefined)
+        {
+            if (this.state.playerTurn === this.state.selectedPiece.player &&
+                this.state.selectedPiece.position.row === position.row &&
+                this.state.selectedPiece.position.column === position.column)
+            {
+                this.setState({ selectedPiece: undefined });
+            }
+        }
+    }
+
+    render()
+    {
+        var tiles = [];
+        var player1pieces = [];
+        var player2pieces = [];
+
         for (let row = 0; row < 8; row++)
         {
             var oddRow = (row % 2 !== 0) ? true : false;
@@ -215,7 +301,6 @@ class Board extends React.Component {
                 var oddColumn = (column % 2 !== 0) ? true : false;
                 var position = { row: row, column: column };
                 var tileID = "tile" + ((row * 8) + (column + 1));
-                var pieceID = "piece" + pieces.length;
 
                 var validTile = false;
                 if (oddRow)
@@ -233,58 +318,61 @@ class Board extends React.Component {
                     }
                 }
 
+                var selected = false;
+                if (this.state.selectedPiece !== undefined)
+                {
+                    if (this.state.selectedPiece.position.row === position.row
+                        && this.state.selectedPiece.position.column === position.column)
+                    {
+                        selected = true;
+                    }
+                }
+
                 if (validTile)
                 {
-                    tiles.push(<Tile key={tileID} position={position}/>);
+                    tiles.push(<Tile key={tileID} position={position} handleClick={this.onTileClick}/>);
 
-                    if (boardState[row][column] === 1)
+                    if (this.state.boardState[row][column] === 1)
                     {
-                        pieces.push(<Piece key={pieceID} player={1} position={position} king={false}/>);
+                        player1pieces.push(<Piece key={player1pieces.length} player={1} position={position} king={false} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
                     }
-                    else if (boardState[row][column] === 2)
+                    else if (this.state.boardState[row][column] === 2)
                     {
-                        pieces.push(<Piece key={pieceID} player={2} position={position} king={false}/>);
+                        player2pieces.push(<Piece key={player2pieces.length} player={2} position={position} king={false} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
                     }
-                    else if (boardState[row][column] === 3)
+                    else if (this.state.boardState[row][column] === 3)
                     {
-                        pieces.push(<Piece key={pieceID} player={1} position={position} king={true}/>);
+                        player1pieces.push(<Piece key={player1pieces.length} player={1} position={position} king={true} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
                     }
-                    else if (boardState[row][column] === 4)
+                    else if (this.state.boardState[row][column] === 4)
                     {
-                        pieces.push(<Piece key={pieceID} player={2} position={position} king={true}/>);
+                        player2pieces.push(<Piece key={player2pieces.length} player={2} position={position} king={true} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
                     }
                 }
             }
         }
-    }
 
-    render()
-    {
-        return (
-            <div className="board">
-                <Tiles tiles={tiles}/>
-                <Pieces/>
-            </div>
-        )
-    }
-}
-
-class GameBoard extends React.Component {
-    render()
-    {
-        // NOTE: Changing the body tag to div hides the game board.
         return (
             <body>
                 <div className="column">
                     <Info/>
-                    <Stats player1="Player 1" player2="Player 2"/>
+                    <Stats playerTurn={this.state.playerTurn} player1="Player 1" player2="Player 2"/>
                 </div>
                 <div className="column">
-                    <Board/>
+                    <div className="board">
+                        {[tiles]}
+                        <Pieces player1pieces={player1pieces} player2pieces={player2pieces}/>
+                    </div>
                 </div>
             </body>
         )
     }
+}
+
+function GameBoard() {
+    return (
+        <Board />
+    );
 }
 
 export default GameBoard;
