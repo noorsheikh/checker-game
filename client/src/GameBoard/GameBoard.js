@@ -26,6 +26,22 @@ function Stats(props)
     var turnStyle = {
         background: turnBackground
     }
+
+    var p1idx = 0;
+    var p1score = [];
+    while (p1idx < props.player1score)
+    {
+        p1score.push(<div key={p1idx} className='capturedPiece'></div>);
+        p1idx++;
+    }
+
+    var p2idx = 0;
+    var p2score = [];
+    while (p2idx < props.player2score)
+    {
+        p2score.push(<div key={p2idx} className='capturedPiece'></div>);
+        p2idx++;
+    }
     
     return (
     <div className="stats">
@@ -33,9 +49,11 @@ function Stats(props)
         <div className="wrapper">
             <div id="player1">
                 <h3>{props.player1 + " (Top)"}</h3>
+                {[p1score]}
             </div>
             <div id="player2">
                 <h3>{props.player2 + " (Bottom)"}</h3>
+                {[p2score]}
             </div>
         </div>
         <div className="turn" style={turnStyle}/>
@@ -53,13 +71,23 @@ function Info()
 }
 
 function Pieces(props) {
+    var player1pieces = [];
+    var player2pieces = [];
+
+    for (let idx in props.pieces)
+    {
+        var piece = props.pieces[idx];
+        if (piece.props.player === 1) player1pieces.push(piece);
+        else if (piece.props.player === 2) player2pieces.push(piece);
+    }
+
     return (
         <div className="pieces">
             <div className="player1pieces">
-                {[props.player1pieces]}
+                {[player1pieces]}
             </div>
             <div className="player2pieces">
-                {[props.player2pieces]}
+                {[player2pieces]}
             </div>
         </div>
     );
@@ -151,12 +179,18 @@ class Board extends React.Component {
                 [2, 0, 2, 0, 2, 0, 2, 0],
                 [0, 2, 0, 2, 0, 2, 0, 2],
                 [2, 0, 2, 0, 2, 0, 2, 0]],
+            player1score: 0,
+            player2score: 0,
             playerTurn: 1,
-            selectedPiece: undefined
+            jumpExist: false,
+            continuousJump: false,
+            selectedPiece: null
         }
 
         this.onTileClick = this.onTileClick.bind(this);
         this.onPieceClick = this.onPieceClick.bind(this);
+
+        this.pieces = [];
     }
 
     tick()
@@ -174,16 +208,17 @@ class Board extends React.Component {
         clearInterval(this.interval);
     }
 
-    isValidPlaceToMove(position)
+    isValidPlaceToMove(tilePosition)
     {
-        var row = position.row;
-        var column = position.column;
+        var row = tilePosition.row;
+        var column = tilePosition.column;
         if (row < 0 || row > 7 || column < 0 || column > 7) return false;
+        var ret = false;
         if (this.state.boardState[row][column] === 0) {
-            if (DEBUG) console.log("isValidPlaceToMove:true");
-            return true;
+            ret = true;
         }
-        return false;
+        //if (DEBUG) console.log("isValidPlaceToMove:" + ret);
+        return ret;
     }
 
     makeKing(position)
@@ -202,30 +237,20 @@ class Board extends React.Component {
 
     getBoardValue(selectedPiece)
     {
-        if (selectedPiece !== undefined)
+        if (selectedPiece !== null)
         {
             if (selectedPiece.king)
             {
-                if (selectedPiece.player === 1)
-                {
-                    return 3;
-                }
-                else if (selectedPiece.player === 2)
-                {
-                    return 4;
-                }
+                if (selectedPiece.player === 1) return 3;
+                else if (selectedPiece.player === 2) return 4;
             }
-            else
-            {
-                return selectedPiece.player;
-            }
+            else return selectedPiece.player;
         }
     }
 
     toggleTurn()
     {
         this.setState({ playerTurn: (this.state.playerTurn === 1) ? 2 : 1 });
-        // TODO: check if jump exists
     }
 
     movePiece(tilePosition)
@@ -246,27 +271,151 @@ class Board extends React.Component {
             //remove the mark from board and put it in the new spot
             boardState[selectedPiece.position.row][selectedPiece.position.column] = 0;
 
-            if (selectedPiece.king)
-            {
-                boardState[tilePosition.row][tilePosition.column] = this.getBoardValue(selectedPiece);
-
-            }
-            else
-            {
-                boardState[tilePosition.row][tilePosition.column] = selectedPiece.player;
-            }
+            boardState[tilePosition.row][tilePosition.column] = this.getBoardValue(selectedPiece);
             this.setState({ boardState: boardState });
             //if piece reaches the end of the row on opposite side crown it a king (can move all directions)
             if (!selectedPiece.king && (selectedPiece.position.row === 0 || selectedPiece.position.row === 7))
                 this.makeKing(tilePosition);
-
-            this.toggleTurn();
         }
+    }
+
+    removePiece(position)
+    {
+        if (DEBUG) console.log("removePiece:" + JSON.stringify(position));
+        var boardState = this.state.boardState;
+        var player = this.state.boardState[position.row][position.column];
+        console.log(player);
+        if (player === 1) this.setState({ player2score: this.state.player2score + 1 });
+        else if (player === 2) this.setState({ player1score: this.state.player1score + 1 });
+        boardState[position.row][position.column] = 0;
+        this.setState({ boardState: boardState });
+    }
+
+    ifWinner()
+    {
+        if (this.state.player1score === 12) return 1;
+        else if (this.state.player2score === 12) return 2;
+        else return false;
+    }
+
+    inRange(tilePosition)
+    {
+        var piece = this.state.selectedPiece;
+        if (piece) {
+            for (var idx in this.pieces) {
+                var k = this.pieces[idx];
+                if (k.props.position.row === tilePosition.row && k.props.position.column === tilePosition.column) return 'wrong';
+            }
+            if (!piece.king && piece.player === 1 && tilePosition.row < piece.position.row) return 'wrong';
+            if (!piece.king && piece.player === 2 && tilePosition.row > piece.position.row) return 'wrong';
+            if (dist(tilePosition.row, tilePosition.column, piece.position.row, piece.position.column) === Math.sqrt(2)) {
+                //regular move
+                return 'regular';
+            } else if (dist(tilePosition.row, tilePosition.column, piece.position.row, piece.position.column) === 2 * Math.sqrt(2)) {
+                //jump move
+                return 'jump';
+            }
+            else {
+                return 'wrong';
+            }
+        }
+    }
+
+    canJumpAny() {
+        var piece = this.state.selectedPiece;
+        if (piece !== null)
+        {
+            var ret = (this.canOpponentJump({ row: piece.position.row + 2, column: piece.position.column + 2 }) ||
+            this.canOpponentJump({ row: piece.position.row + 2, column: piece.position.column - 2 }) ||
+            this.canOpponentJump({ row: piece.position.row - 2, column: piece.position.column + 2 }) ||
+            this.canOpponentJump({ row: piece.position.row - 2, column: piece.position.column - 2 }));
+
+            if (DEBUG) console.log("canJumpAny:" + ret);
+            return ret;
+        }
+        return false;
+    };
+
+    canOpponentJump(newPosition)
+    {
+        var piece = this.state.selectedPiece;
+        if (piece)
+        {
+            //find what the displacement is
+            var dx = newPosition.column - piece.position.column;
+            var dy = newPosition.row - piece.position.row;
+            //make sure object doesn't go backwards if not a king
+            if (piece.player === 1 && piece.king === false) {
+                if (newPosition.row < piece.position.row) return false;
+            } else if (piece.player === 2 && piece.king === false) {
+                if (newPosition.row > piece.position.row) return false;
+            }
+            //must be in bounds
+            if (newPosition.row > 7 || newPosition.column > 7 || newPosition.row < 0 || newPosition.column < 0) return false;
+            //middle tile where the piece to be conquered sits
+            var tileToCheckx = piece.position.column + (dx / 2);
+            var tileToChecky = piece.position.row + (dy / 2);
+            if (tileToCheckx > 7 || tileToChecky > 7 || tileToCheckx < 0 || tileToChecky < 0) return false;
+            //if there is a piece there and there is no piece in the space after that
+            if (!this.isValidPlaceToMove({ row: tileToCheckx, colmn: tileToChecky }) && this.isValidPlaceToMove({ row: newPosition.row, column: newPosition.column })) {
+                for (let pieceIndex in this.pieces) {
+                    var thisPiece = this.pieces[pieceIndex].props;
+                    if (thisPiece.position.row === tileToChecky && thisPiece.position.column === tileToCheckx) {
+                        if (piece.player !== thisPiece.player) {
+                            //return the piece sitting there
+                            var ret = thisPiece.position;
+
+                            if (DEBUG) console.log("canOpponentJump:" + JSON.stringify(ret));
+                            return ret;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    opponentJump(tilePosition)
+    {
+        var jumpPosition = this.canOpponentJump(tilePosition);
+        if (jumpPosition)
+        {
+            this.removePiece(jumpPosition);
+            return true;
+        }
+        return false;
     }
 
     onTileClick(tilePosition)
     {
         if (DEBUG) console.log("onTileClick:" + JSON.stringify({tilePosition}));
+
+        var inRange = this.inRange(tilePosition);
+        console.log(inRange);
+        if (inRange !== 'wrong') {
+            if (inRange === 'jump') {
+                if (this.opponentJump(tilePosition)) {
+                    this.movePiece(tilePosition);
+                    if (this.canJumpAny()) {
+                        this.setState({ continuousJump: true });
+                    }
+                    else {
+                        this.toggleTurn();
+                    }
+                }
+            }
+            else if (inRange === 'regular' && !this.state.jumpExist) {
+                if (!this.canJumpAny())
+                {
+                    this.movePiece(tilePosition);
+                    this.toggleTurn();
+                }
+                else {
+                    alert("You must jump when possible!");
+                }
+            }
+        }
+
         if (!this.isValidPlaceToMove(tilePosition)) return;
         this.movePiece(tilePosition);
     }
@@ -275,14 +424,20 @@ class Board extends React.Component {
     {
         if (DEBUG) console.log("onPieceClick:" + JSON.stringify({player, position, king}));
 
-        this.setState({ selectedPiece: {player: player, position: position, king: king} });
-        if (this.state.selectedPiece !== undefined)
+        if (this.state.playerTurn === player)
         {
-            if (this.state.playerTurn === this.state.selectedPiece.player &&
-                this.state.selectedPiece.position.row === position.row &&
-                this.state.selectedPiece.position.column === position.column)
+            if (this.state.selectedPiece !== null)
             {
-                this.setState({ selectedPiece: undefined });
+                if (this.state.selectedPiece.position.row === position.row &&
+                    this.state.selectedPiece.position.column === position.column) {
+                    this.setState({ selectedPiece: null });
+                }
+                else {
+                    this.setState({ selectedPiece: {player: player, position: position, king: king} });
+                }
+            }
+            else {
+                this.setState({ selectedPiece: {player: player, position: position, king: king} });
             }
         }
     }
@@ -290,8 +445,7 @@ class Board extends React.Component {
     render()
     {
         var tiles = [];
-        var player1pieces = [];
-        var player2pieces = [];
+        var pieces = [];
 
         for (let row = 0; row < 8; row++)
         {
@@ -319,7 +473,7 @@ class Board extends React.Component {
                 }
 
                 var selected = false;
-                if (this.state.selectedPiece !== undefined)
+                if (this.state.selectedPiece !== null)
                 {
                     if (this.state.selectedPiece.position.row === position.row
                         && this.state.selectedPiece.position.column === position.column)
@@ -332,36 +486,53 @@ class Board extends React.Component {
                 {
                     tiles.push(<Tile key={tileID} position={position} handleClick={this.onTileClick}/>);
 
-                    if (this.state.boardState[row][column] === 1)
+                    if (this.state.boardState[row][column] !== 0)
                     {
-                        player1pieces.push(<Piece key={player1pieces.length} player={1} position={position} king={false} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
-                    }
-                    else if (this.state.boardState[row][column] === 2)
-                    {
-                        player2pieces.push(<Piece key={player2pieces.length} player={2} position={position} king={false} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
-                    }
-                    else if (this.state.boardState[row][column] === 3)
-                    {
-                        player1pieces.push(<Piece key={player1pieces.length} player={1} position={position} king={true} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
-                    }
-                    else if (this.state.boardState[row][column] === 4)
-                    {
-                        player2pieces.push(<Piece key={player2pieces.length} player={2} position={position} king={true} selected={selected} playerTurn={this.state.playerTurn} handleClick={this.onPieceClick}/>);
+                        var player = 1;
+                        var king = false;
+                        if (this.state.boardState[row][column] === 2)
+                        {
+                            player = 2;
+                        }
+                        else if (this.state.boardState[row][column] === 3)
+                        {
+                            king = true;
+                        }
+                        else if (this.state.boardState[row][column] === 4)
+                        {
+                            player = 2;
+                            king = true;
+                        }
+
+                        var piece = <Piece
+                                    key={pieces.length}
+                                    player={player}
+                                    position={position}
+                                    king={king}
+                                    selected={selected}
+                                    playerTurn={this.state.playerTurn}
+                                    handleClick={this.onPieceClick}/>;
+                        pieces.push(piece);
                     }
                 }
             }
         }
+        this.pieces = pieces;
 
         return (
             <body>
                 <div className="column">
                     <Info/>
-                    <Stats playerTurn={this.state.playerTurn} player1="Player 1" player2="Player 2"/>
+                    <Stats
+                        playerTurn={this.state.playerTurn}
+                        player1="Player 1" player2="Player 2"
+                        player1score={this.state.player1score}
+                        player2score={this.state.player2score}/>
                 </div>
                 <div className="column">
                     <div className="board">
                         {[tiles]}
-                        <Pieces player1pieces={player1pieces} player2pieces={player2pieces}/>
+                        <Pieces pieces={pieces}/>
                     </div>
                 </div>
             </body>
