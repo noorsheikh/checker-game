@@ -415,9 +415,6 @@ class Board extends React.Component {
                 }
             }
         }
-
-        if (!this.isValidPlaceToMove(tilePosition)) return;
-        this.movePiece(tilePosition);
     }
 
     onPieceClick(player, position, king)
