@@ -38,12 +38,12 @@ class UserController extends BaseController
     // validate user data and if the data is invalid print error message to client side
     $errors = $this->validator->validate($user);
     if (count($errors) > 0) {
-      return $this->json([ 'message' => $errors[0]->getMessage() ]);
+      return $this->json([ 'message' => $errors[0]->getMessage() ], 500);
     }
 
     $this->getDoctrine()->getManager()->persist($user);
     $this->getDoctrine()->getManager()->flush();
 
-    return $this->json( ['message' => sprintf('User %s successfully registered', $user->getUsername()) ]);
+    return $this->json( ['message' => sprintf('User %s successfully registered', $user->getUsername()) ], 200);
   }
 }
