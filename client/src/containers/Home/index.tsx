@@ -3,8 +3,6 @@ import { Navbar, Nav, Container } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
-import { CurrentUserUtil } from '../../utils';
-import { CurrentUser } from '../../models';
 
 interface HProps {
   currentUser: CurrentUserState;
@@ -16,11 +14,6 @@ interface HState {
 }
 
 class Home extends React.Component<HProps, HState> {
-  handleUserLogout = () => {
-    CurrentUserUtil.removeCurrentUser();
-    this.props.history.push('/');
-  }
-
   render() {
     const { currentUser } = this.props.currentUser;
     console.log(currentUser);
@@ -34,7 +27,7 @@ class Home extends React.Component<HProps, HState> {
                   {currentUser?.isLoggedIn ?
                     <React.Fragment>
                       <Nav.Link>Welcome { currentUser?.firstName ?? `${currentUser?.username}` }</Nav.Link>
-                      <Nav.Link className='navbar__auth-nav--item' onClick={this.handleUserLogout}>
+                      <Nav.Link className='navbar__auth-nav--item'>
                           Logout
                       </Nav.Link>
                     </React.Fragment>

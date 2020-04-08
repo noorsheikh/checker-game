@@ -1,5 +1,6 @@
 import { User } from "../../models/User";
 import { RegisterUserActionTypes } from "../../actions/user";
+import { AnyAction } from "redux";
 
 interface RegisterUserAction {
   type: string;
@@ -7,7 +8,7 @@ interface RegisterUserAction {
   error: string;
 }
 
-export const registerUserReducer = (state = {}, action: RegisterUserAction) => {
+export const registerUserReducer = (state: any = null, action: AnyAction) => {
   switch(action.type) {
     case RegisterUserActionTypes.REGISTER_USER_PENDING:
       return {

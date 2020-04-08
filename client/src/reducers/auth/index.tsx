@@ -1,5 +1,6 @@
 import { CurrentUser } from "../../models/CurrentUser";
 import { LoginActions } from '../../actions/auth';
+import { AnyAction } from "redux";
 
 interface UserLoginAction {
   type: string;
@@ -27,7 +28,7 @@ const initialState: CurrentUserState = {
   error: ''
 };
 
-export const userLoginReducer = (state = initialState, action: UserLoginAction) => {
+export const userLoginReducer = (state = initialState, action: AnyAction) => {
   switch(action.type) {
     case LoginActions.LOGIN_PENDING:
       return {

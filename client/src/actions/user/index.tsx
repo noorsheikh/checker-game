@@ -12,7 +12,7 @@ export enum RegisterUserActionTypes {
 export const registerUser = (userPayload: User) => async (dispatch: Dispatch) => {
   dispatch({ type: RegisterUserActionTypes.REGISTER_USER_PENDING });
   try {
-    const user = axios.post(`http://localhost:80/api/user/register`, userPayload);
+    const user = await axios.post(`http://localhost:80/api/user/register`, userPayload);
     dispatch({
       type: RegisterUserActionTypes.REGISTER_USER_SUCCESS,
       payload: user
