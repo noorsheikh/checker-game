@@ -6,6 +6,7 @@ import { store, persistor } from './store';
 
 import Home from './containers/Home';
 import SignIn from './containers/SignIn';
+import SignUp from './containers/SignUp';
 
 class App extends React.Component<{}, {}> {
   render() {
@@ -18,7 +19,7 @@ class App extends React.Component<{}, {}> {
           <Router>
             <Route path="/" exact component={Home} />
             <Route path="/sign-in" exact component={SignIn} />
-            <Route path="/sign-up" exact component={SignIn} />
+            <Route path="/sign-up" exact component={SignUp} />
           </Router>
         </PersistGate>
       </Provider>
