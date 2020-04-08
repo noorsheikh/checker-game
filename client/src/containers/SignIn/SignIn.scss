@@ -1,5 +1,5 @@
 .cg-heading {
-  padding: 2rem;
+  padding: 3.5rem;
   text-align: center;
 
   &__text {
@@ -11,10 +11,10 @@
 .cg-section {
   position: relative;
   padding: 1rem;
-  margin-top: 1rem;
+  margin-top: 0rem;
 
   &__form {
-      border: 1px solid $tertiary;
+      border: 1px solid $quaternary;
       margin-top: 3rem;
       padding: 5rem 3rem;
       border-radius: .5rem;
@@ -23,7 +23,7 @@
           height: calc(2em + 1rem + 2px);
           font-size: $font-size-base * 1;
           border: none;
-          border-bottom: 1px solid $tertiary;
+          border: 1px solid $quaternary;
           border-radius: 0;
       }
 
@@ -33,7 +33,7 @@
           border: none;
       }
 
-      &--color { color: $tertiary }
+      &--color { color: $secondary }
 
       &--action { text-align: right; }
 

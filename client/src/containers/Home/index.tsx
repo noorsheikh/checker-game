@@ -14,8 +14,13 @@ interface HState {
 }
 
 class Home extends React.Component<HProps, HState> {
+  handleUserLogout = () => {
+    window.sessionStorage.removeItem('persist:root');
+    window.location.reload();
+  }
+
   render() {
-    const { currentUser } = this.props.currentUser;
+    const currentUser = this.props?.currentUser?.currentUser;
     return (
       <Navbar collapseOnSelect expand='lg' className="navbar">
         <Container>
@@ -25,8 +30,8 @@ class Home extends React.Component<HProps, HState> {
                 <Nav>
                   {currentUser?.isLoggedIn ?
                     <React.Fragment>
-                      <Nav.Link>Welcome { currentUser?.firstName ?? `${currentUser?.username}` }</Nav.Link>
-                      <Nav.Link className='navbar__auth-nav--item' onClick={ () => window.sessionStorage.removeItem('persist:root') }>
+                      <Nav.Link>Welcome { currentUser?.firstname ?? `${currentUser?.username}` }</Nav.Link>
+                      <Nav.Link className='navbar__auth-nav--item' onClick={this.handleUserLogout}>
                           Logout
                       </Nav.Link>
                     </React.Fragment>

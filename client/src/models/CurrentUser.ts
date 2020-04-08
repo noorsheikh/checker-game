@@ -1,9 +1,9 @@
 export interface CurrentUser {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   username: string;
   email: string;
-  userType: string;
+  usertype: string;
   token: string;
   isLoggedIn: boolean;
   iat?: number;

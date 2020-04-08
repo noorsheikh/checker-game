@@ -3,7 +3,7 @@ import { Container, Row, Col, Form, FormGroup, InputGroup, Button } from 'react-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
-import { registerUser, login } from '../../actions';
+import { login } from '../../actions';
 import { CurrentUserState } from '../../reducers/auth';
 import { Link } from 'react-router-dom';
 
@@ -90,7 +90,7 @@ class SignIn extends React.Component<SIProps, SIState> {
                                 </FormGroup>
                                 <div className="cg-section__form--action">
                                     <div className='cg-section__form--action-link'>
-                                        <span className='cg-section__form--action-link-text'>New account:</span>
+                                        <span className='cg-section__form--action-link-text'>New account: </span>
                                         <Link to="/sign-up">Sign Up</Link>
                                     </div>
                                     <Button type="submit" className="cg-section__form--action-submit">Sign In</Button>

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Container, Row, Col, Form, FormGroup, InputGroup, Button, NavLink, Nav } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormGroup, InputGroup, Button } from 'react-bootstrap';
 import { User } from '../../models/User';
 import { connect } from 'react-redux';
-import { registerUser, login } from '../../actions';
+import { registerUser } from '../../actions';
 import { CurrentUserState } from '../../reducers/auth';
-import { Route, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface SIProps {
     currentUser?: CurrentUserState;
@@ -16,26 +16,34 @@ interface SIProps {
 interface SIState {
     user?: User;
     currentUser?: CurrentUserState;
-    username: string;
-    password: string;
 }
 
 class SignUp extends React.Component<SIProps, SIState> {
     state = {
         user: {} as User,
-        username: '',
-        password: '',
     };
 
     handleRegisterUserChange = (event: any) => {
         const { name, value } = event.currentTarget;
         const user = {...this.state.user};
-        if (name === 'username') {
-            user['username'] = value;
-        } else if (name === 'email') {
-            user['email'] = value;
-        } else if (name === 'password') {
-            user['password'] = value;
+        switch(name) {
+            case 'username':
+                user['username'] = value;
+                break;
+            case 'email':
+                user['email'] = value;
+                break;
+            case 'password':
+                user['password'] = value;
+                break;
+            case 'firstname':
+                user['firstname'] = value;
+                break;
+            case 'lastname':
+                user['lastname'] = value;
+                break;
+            default:
+                return;
         }
         this.setState({ user } as SIState, () => this.state);
     }
@@ -59,12 +67,34 @@ class SignUp extends React.Component<SIProps, SIState> {
                   <Col lg={{ span: 6, offset: 3 }}  className="justify-content-md-center">
                       <div className="cg-section">
                           <Form className="cg-section__form" onSubmit={this.handleRegisterUserSubmit} noValidate>
-                          <FormGroup>
+                            <FormGroup>
                                   <InputGroup>
                                       <Form.Control
                                           type="text"
                                           className="cg-section__form--input"
-                                          placeholder="Your Username"
+                                          placeholder="First Name"
+                                          name="firstname"
+                                          onChange={this.handleRegisterUserChange}
+                                          />
+                                  </InputGroup>
+                              </FormGroup>
+                            <FormGroup>
+                                  <InputGroup>
+                                      <Form.Control
+                                          type="text"
+                                          className="cg-section__form--input"
+                                          placeholder="Last Name"
+                                          name="lastname"
+                                          onChange={this.handleRegisterUserChange}
+                                          />
+                                  </InputGroup>
+                              </FormGroup>
+                            <FormGroup>
+                                  <InputGroup>
+                                      <Form.Control
+                                          type="text"
+                                          className="cg-section__form--input"
+                                          placeholder="Username"
                                           name="username"
                                           onChange={this.handleRegisterUserChange}
                                           />
@@ -75,7 +105,7 @@ class SignUp extends React.Component<SIProps, SIState> {
                                       <Form.Control
                                           type="email"
                                           className="cg-section__form--input"
-                                          placeholder="Your Email"
+                                          placeholder="Email"
                                           name="email"
                                           onChange={this.handleRegisterUserChange}
                                           />
@@ -86,7 +116,7 @@ class SignUp extends React.Component<SIProps, SIState> {
                                       <Form.Control
                                           type="password"
                                           className="cg-section__form--input"
-                                          placeholder="Your Password"
+                                          placeholder="Password"
                                           name="password"
                                           onChange={this.handleRegisterUserChange}
                                           />
@@ -94,7 +124,7 @@ class SignUp extends React.Component<SIProps, SIState> {
                               </FormGroup>
                               <div className="cg-section__form--action">
                                   <div className='cg-section__form--action-link'>
-                                      <span className='cg-section__form--action-link-text'>Already have an account:</span>
+                                      <span className='cg-section__form--action-link-text'>Already have an account: </span>
                                       <Link to="/sign-in">Sign In</Link>
                                   </div>
                                   <Button type="submit" className="cg-section__form--action-submit">Register</Button>

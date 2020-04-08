@@ -14,21 +14,7 @@ export interface CurrentUserState {
   error: string;
 }
 
-const initialState: CurrentUserState = {
-  pending: true,
-  currentUser: {
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: '',
-    userType: '',
-    token: '',
-    isLoggedIn: false,
-  },
-  error: ''
-};
-
-export const userLoginReducer = (state = initialState, action: AnyAction) => {
+export const userLoginReducer = (state: any = null, action: AnyAction) => {
   switch(action.type) {
     case LoginActions.LOGIN_PENDING:
       return {

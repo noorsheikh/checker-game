@@ -1,14 +1,14 @@
 export interface User {
   id: number;
-  firstName?: string;
-  lastName?: string;
+  firstname?: string;
+  lastname?: string;
   username: string;
   password: string;
-  userType?: string;
+  usertype?: string;
   email: string;
-  birthDate?: string;
+  birthdate?: string;
   phone?: string;
   gender?: string;
-  profileImage?: string;
-  updatedOn?: string;
+  profileimage?: string;
+  updatedon?: string;
 }
