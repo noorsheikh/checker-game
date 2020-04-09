@@ -34,4 +34,4 @@ RUN mv composer.phar /usr/local/bin/composer
 
 RUN composer install
 
-EXPOSE 80
+EXPOSE 80 443
