@@ -42,6 +42,9 @@ function Stats(props)
         p2score.push(<div key={p2idx} className='capturedPiece'></div>);
         p2idx++;
     }
+
+    const winner = props.winner === undefined ? undefined :
+        <span id="winner">{props.winner} won!</span>;
     
     return (
     <div className="stats">
@@ -57,6 +60,7 @@ function Stats(props)
             </div>
         </div>
         <div className="turn" style={turnStyle}/>
+        {winner}
     </div>);
 }
 
@@ -274,8 +278,16 @@ class Board extends React.Component {
             boardState[tilePosition.row][tilePosition.column] = this.getBoardValue(selectedPiece);
             this.setState({ boardState: boardState });
             //if piece reaches the end of the row on opposite side crown it a king (can move all directions)
-            if (!selectedPiece.king && (selectedPiece.position.row === 0 || selectedPiece.position.row === 7))
-                this.makeKing(tilePosition);
+            if (!selectedPiece.king) {
+                if (selectedPiece.player === 1) {
+                    if (tilePosition.row === 7)
+                        this.makeKing(tilePosition);
+                }
+                else if (selectedPiece.player === 2) {
+                    if (tilePosition.row === 0)
+                        this.makeKing(tilePosition);
+                }
+            }
         }
     }
 
@@ -289,6 +301,7 @@ class Board extends React.Component {
         else if (player === 2) this.setState({ player1score: this.state.player1score + 1 });
         boardState[position.row][position.column] = 0;
         this.setState({ boardState: boardState });
+        this.ifWinner();
     }
 
     ifWinner()
@@ -405,14 +418,16 @@ class Board extends React.Component {
                 }
             }
             else if (inRange === 'regular' && !this.state.jumpExist) {
-                if (!this.canJumpAny())
+                /* if (!this.canJumpAny())
                 {
                     this.movePiece(tilePosition);
                     this.toggleTurn();
                 }
                 else {
                     alert("You must jump when possible!");
-                }
+                } */
+                this.movePiece(tilePosition);
+                this.toggleTurn();
             }
         }
     }
@@ -516,6 +531,10 @@ class Board extends React.Component {
         }
         this.pieces = pieces;
 
+        var winner = undefined;
+        if (this.state.player1score === 12) winner = "Player 1";
+        else if (this.state.player1score === 12) winner = "Player 2";
+
         return (
             <body>
                 <div className="column">
@@ -524,7 +543,8 @@ class Board extends React.Component {
                         playerTurn={this.state.playerTurn}
                         player1="Player 1" player2="Player 2"
                         player1score={this.state.player1score}
-                        player2score={this.state.player2score}/>
+                        player2score={this.state.player2score}
+                        winner={winner}/>
                 </div>
                 <div className="column">
                     <div className="board">
