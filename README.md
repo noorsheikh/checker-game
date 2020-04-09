@@ -54,7 +54,7 @@ Open Virtual Box default vm settings. Select Network tab, Port Forwarding and th
 
 ## Backend Endpoints
 Base Url: http://localhost:80
-
+HTTPs Url: https://localhost:443
 | Endpoint URI        | Method           | Description  |
 | ------------- |-------------| -----|
 | /api/login      | POST | This endpoint is used for user login |
