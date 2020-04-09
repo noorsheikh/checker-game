@@ -12,11 +12,16 @@ WORKDIR /var/www/html/
 # enable mode_rewrite module
 RUN a2enmod rewrite
 
+# enable SSL module
+RUN a2enmod ssl
+
 # disable default site
 RUN a2dissite 000-default.conf
 
 # copy new site to sites-available directory
 RUN cat ./httpd-conf/apache2.conf > /etc/apache2/sites-available/localhost.conf
+RUN cat ./httpd-conf/server.key > /etc/ssl/certs/server.key
+RUN cat ./httpd-conf/server.crt > /etc/ssl/certs/server.crt
 
 # enable new site
 RUN a2ensite localhost.conf
