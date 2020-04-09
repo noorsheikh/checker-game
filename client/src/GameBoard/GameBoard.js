@@ -176,18 +176,17 @@ class Board extends React.Component {
         this.state = {
             boardState: [
                 [0, 1, 0, 1, 0, 1, 0, 1],
-                [1, 0, 1, 0, 1, 0, 1, 0],
-                [0, 1, 0, 1, 0, 1, 0, 1],
+                [1, 0, 1, 0, 1, 0, 2, 0],
+                [0, 1, 0, 1, 0, 0, 0, 1],
+                [0, 0, 0, 0, 2, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0],
-                [2, 0, 2, 0, 2, 0, 2, 0],
-                [0, 2, 0, 2, 0, 2, 0, 2],
+                [2, 0, 2, 0, 0, 0, 2, 0],
+                [0, 0, 0, 2, 0, 2, 0, 2],
                 [2, 0, 2, 0, 2, 0, 2, 0]],
             player1score: 0,
             player2score: 0,
             playerTurn: 1,
             jumpExist: false,
-            continuousJump: false,
             selectedPiece: null
         }
 
@@ -296,19 +295,10 @@ class Board extends React.Component {
         if (DEBUG) console.log("removePiece:" + JSON.stringify(position));
         var boardState = this.state.boardState;
         var player = this.state.boardState[position.row][position.column];
-        console.log(player);
         if (player === 1) this.setState({ player2score: this.state.player2score + 1 });
         else if (player === 2) this.setState({ player1score: this.state.player1score + 1 });
         boardState[position.row][position.column] = 0;
         this.setState({ boardState: boardState });
-        this.ifWinner();
-    }
-
-    ifWinner()
-    {
-        if (this.state.player1score === 12) return 1;
-        else if (this.state.player2score === 12) return 2;
-        else return false;
     }
 
     inRange(tilePosition)
@@ -334,24 +324,22 @@ class Board extends React.Component {
         }
     }
 
-    canJumpAny() {
-        var piece = this.state.selectedPiece;
+    canJumpAny(piece) {
         if (piece !== null)
         {
-            var ret = (this.canOpponentJump({ row: piece.position.row + 2, column: piece.position.column + 2 }) ||
-            this.canOpponentJump({ row: piece.position.row + 2, column: piece.position.column - 2 }) ||
-            this.canOpponentJump({ row: piece.position.row - 2, column: piece.position.column + 2 }) ||
-            this.canOpponentJump({ row: piece.position.row - 2, column: piece.position.column - 2 }));
+            var ret = (this.canOpponentJump(piece, { row: piece.position.row + 2, column: piece.position.column + 2 }) ||
+            this.canOpponentJump(piece, { row: piece.position.row + 2, column: piece.position.column - 2 }) ||
+            this.canOpponentJump(piece, { row: piece.position.row - 2, column: piece.position.column + 2 }) ||
+            this.canOpponentJump(piece, { row: piece.position.row - 2, column: piece.position.column - 2 }));
 
-            if (DEBUG) console.log("canJumpAny:" + ret);
+            //if (DEBUG) console.log("canJumpAny:" + JSON.stringify(ret) + ", " + JSON.stringify(piece));
             return ret;
         }
         return false;
     };
 
-    canOpponentJump(newPosition)
+    canOpponentJump(piece, newPosition)
     {
-        var piece = this.state.selectedPiece;
         if (piece)
         {
             //find what the displacement is
@@ -378,7 +366,7 @@ class Board extends React.Component {
                             //return the piece sitting there
                             var ret = thisPiece.position;
 
-                            if (DEBUG) console.log("canOpponentJump:" + JSON.stringify(ret));
+                            //if (DEBUG) console.log("canOpponentJump:" + JSON.stringify(ret));
                             return ret;
                         }
                     }
@@ -390,7 +378,7 @@ class Board extends React.Component {
 
     opponentJump(tilePosition)
     {
-        var jumpPosition = this.canOpponentJump(tilePosition);
+        var jumpPosition = this.canOpponentJump(this.state.selectedPiece, tilePosition);
         if (jumpPosition)
         {
             this.removePiece(jumpPosition);
@@ -409,8 +397,18 @@ class Board extends React.Component {
             if (inRange === 'jump') {
                 if (this.opponentJump(tilePosition)) {
                     this.movePiece(tilePosition);
-                    if (this.canJumpAny()) {
-                        this.setState({ continuousJump: true });
+                    var value = this.state.boardState[tilePosition.row][tilePosition.column];
+                    var player = 1;
+                    var king = false;
+                    if (value === 2) player = 2;
+                    else if (value === 3) king = true;
+                    else if (value === 4) {
+                        player = 2;
+                        king = true;
+                    }
+                    this.setState({ selectedPiece: { position: tilePosition, player, king }});
+                    if (this.canJumpAny({ position: tilePosition, player, king })) {
+                        // continuous jump
                     }
                     else {
                         this.toggleTurn();
@@ -418,16 +416,14 @@ class Board extends React.Component {
                 }
             }
             else if (inRange === 'regular' && !this.state.jumpExist) {
-                /* if (!this.canJumpAny())
+                if (!this.canJumpAny(this.state.selectedPiece))
                 {
                     this.movePiece(tilePosition);
                     this.toggleTurn();
                 }
                 else {
                     alert("You must jump when possible!");
-                } */
-                this.movePiece(tilePosition);
-                this.toggleTurn();
+                }
             }
         }
     }
@@ -438,10 +434,48 @@ class Board extends React.Component {
 
         if (this.state.playerTurn === player)
         {
-            if (this.state.selectedPiece !== null)
+            var piecesThatCanJump = [];
+            for (let row = 0; row < 8; row++) {
+                for (let column = 0; column < 8; column++) {
+                    var boardValue = this.state.boardState[row][column];
+                    if (boardValue !== 0) {
+                        var boardPlayer = 1;
+                        var boardKing = false;
+                        if (boardValue === 2) boardPlayer = 2;
+                        else if (boardValue === 3) boardKing = true;
+                        else if (boardValue === 4) {
+                            boardPlayer = 2;
+                            boardKing = true;
+                        }
+
+                        var piece = { position: { row, column }, player: boardPlayer, king: boardKing };
+                        if (this.canJumpAny(piece)) {
+                            piecesThatCanJump.push(piece);
+                        }
+                    }
+                }
+            }
+            console.log(piecesThatCanJump);
+            var selectedPieceCanJump = false;
+            for (var idx in piecesThatCanJump) {
+                var jumpablePiece = piecesThatCanJump[idx];
+                if (jumpablePiece.position.row === position.row &&
+                    jumpablePiece.position.column === position.column)
+                {
+                    selectedPieceCanJump = true;
+                }
+            }
+
+            if (!selectedPieceCanJump) {
+                alert("You must jump when possible and this piece can't jump!");
+                return;
+            }
+
+            var selectedPiece = this.state.selectedPiece;
+            if (selectedPiece !== null)
             {
-                if (this.state.selectedPiece.position.row === position.row &&
-                    this.state.selectedPiece.position.column === position.column) {
+                if (selectedPiece.position.row === position.row &&
+                    selectedPiece.position.column === position.column) {
                     this.setState({ selectedPiece: null });
                 }
                 else {
