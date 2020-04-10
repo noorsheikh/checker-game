@@ -6,4 +6,6 @@ server/.env
 server/httpd-conf/server.crt
 server/httpd-conf/server.key
 client/node_modules/
+client/client.crt
+client/client.key
 .idea
