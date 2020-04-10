@@ -3,5 +3,7 @@ server/vendor/
 server/src/Migrations/
 server/config/jwt/
 server/.env
+server/httpd-conf/server.crt
+server/httpd-conf/server.key
 client/node_modules/
 .idea

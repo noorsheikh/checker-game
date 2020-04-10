@@ -44,11 +44,18 @@ After spinning the containers use this url [http://localhost:3000/](http://local
 ### Windows Local Browser URL
 After contains are up, use the command below to get the IP address to use with the exposed port (192.168.99.100:3000).
 ```docker-machine ip```
+### Windows Virtual Box Settings to make localhost option work ###
+Open Virtual Box default vm settings. Select Network tab, Port Forwarding and then add the following entries
+| Name        | Protocol           | Host IP  | Host Port | Guest IP | Guest Port
+| ------------- |-------------| -----| -----| -----| -----|
+| client      | POST | 127.0.0.1 | 3000 | 192.168.99.100 | 3000 |
+| symfony      | POST | 127.0.0.1 | 80 | 192.168.99.100 | 80 |
+
 
 ## Backend Endpoints
 Base Url: http://localhost:80
-
+HTTPs Url: https://localhost:443
 | Endpoint URI        | Method           | Description  |
 | ------------- |-------------| -----|
-| /api/login      | POST | This endponint is used for user login |
+| /api/login      | POST | This endpoint is used for user login |
 | /api/user/register      | POST      |   This endpoint is used for registering new user |
