@@ -50,6 +50,7 @@ Open Virtual Box default vm settings. Select Network tab, Port Forwarding and th
 | ------------- |-------------| -----| -----| -----| -----|
 | client      | POST | 127.0.0.1 | 3000 | 192.168.99.100 | 3000 |
 | symfony      | POST | 127.0.0.1 | 80 | 192.168.99.100 | 80 |
+| symfony_secured      | POST | 127.0.0.1 | 443 | 192.168.99.100 | 443 |
 
 
 ## Backend Endpoints
