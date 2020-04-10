@@ -4,4 +4,6 @@ server/src/Migrations/
 server/config/jwt/
 server/.env
 client/node_modules/
+client/client.crt
+client/client.key
 .idea
