@@ -5,6 +5,7 @@ namespace Checker\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -27,21 +28,36 @@ class User implements UserInterface
 
   /**
    * @ORM\Column(type="string", name="first_name", length=100, nullable=false)
+   * @Assert\NotBlank(
+   *  message = "First name cannot be blank"
+   * )
    */
   private $firstName;
 
   /**
    * @ORM\Column(type="string", name="last_name", length=100, nullable=false)
+   * @Assert\NotBlank(
+   *  message = "Last name cannot be blank"
+   * )
    */
   private $lastName;
 
   /**
    * @ORM\Column(type="string", length=100, nullable=false)
+   * @Assert\NotBlank(
+   *  message = "Username cannot be blank"
+   * )
    */
   private $username;
 
   /**
    * @ORM\Column(type="string", length=100, nullable=false)
+   * @Assert\NotBlank(
+   *  message = "Email cannot be blank"
+   * )
+   * @Assert\Email(
+   *  message = "Please enter a valid email address"
+   * )
    */
   private $email;
 
@@ -49,6 +65,9 @@ class User implements UserInterface
 
   /**
    * @ORM\Column(type="string", length=100, nullable=false)
+   * @Assert\NotBlank(
+   *  message = "Password cannot be blank"
+   * )
    */
   private $password;
 

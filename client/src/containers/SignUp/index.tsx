@@ -1,21 +1,23 @@
 import React from 'react';
-import { Container, Row, Col, Form, FormGroup, InputGroup, Button } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormGroup, InputGroup, Button, Alert } from 'react-bootstrap';
 import { User } from '../../models/User';
 import { connect } from 'react-redux';
 import { registerUser } from '../../actions';
 import { CurrentUserState } from '../../reducers/auth';
-import { Link } from 'react-router-dom';
+import { RegisterUserState } from '../../reducers/user';
+import { Link, Redirect } from 'react-router-dom';
 
 interface SIProps {
     currentUser?: CurrentUserState;
+    user?: User;
+    register?: RegisterUserState;
     registerUser: Function;
-    login: Function;
-    history: any;
 }
 
 interface SIState {
     user?: User;
     currentUser?: CurrentUserState;
+    register?: RegisterUserState;
 }
 
 class SignUp extends React.Component<SIProps, SIState> {
@@ -54,6 +56,10 @@ class SignUp extends React.Component<SIProps, SIState> {
     }
 
     render() {
+        const register = this.props?.register;
+        if (register?.user?.username) {
+            return <Redirect to="/" />;
+        }
         return (
             <Container>
                 <Row>
@@ -63,6 +69,18 @@ class SignUp extends React.Component<SIProps, SIState> {
                         </div>
                     </Col>
                 </Row>
+                {register?.error &&
+                    <Row>
+                        <Col lg={{ span: 6, offset: 3 }}>
+                            <Alert variant='danger'>
+                                <Alert.Heading>Registration Failed</Alert.Heading>
+                                <ul>
+                                    {register?.error?.map(error => <li>{error}</li>)}
+                                </ul>
+                            </Alert>
+                        </Col>
+                    </Row>
+                }
                 <Row>
                   <Col lg={{ span: 6, offset: 3 }}  className="justify-content-md-center">
                       <div className="cg-section">
@@ -139,8 +157,8 @@ class SignUp extends React.Component<SIProps, SIState> {
 }
 
 const mapStateToProps = (state: SIState) => ({
-    user: state.user,
     currentUser: state.currentUser,
+    register: state.register,
 });
 
 export default connect(mapStateToProps, {registerUser})(SignUp);

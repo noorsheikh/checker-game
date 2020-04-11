@@ -9,6 +9,9 @@
   ✔ Create User Login Endpoint @done (3/31/2020, 10:36:34 PM)
   ✔ Create User Registration Endpoint @done (3/31/2020, 10:36:35 PM)
   ✔ Setup Password Encoder @done (3/31/2020, 10:36:55 PM)
+  ✔ Add input validation for login form @done (4/10/2020, 10:22:38 PM)
+  ✔ Add input validation for user registration form @done (4/10/2020, 10:22:39 PM)
+  ✔ Add login and registration successfull redirects @done (4/10/2020, 10:22:40 PM)
 
 
 

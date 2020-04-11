@@ -17,15 +17,18 @@ class UserController extends BaseController
    */
   public function register(Request $request): JsonResponse
   {
-    $requestData = json_decode($request->getContent());
+    $requestData = json_decode($request->getContent(), true);
+    if (count($requestData) <= 0) {
+      return $this->json([ 'message' => ['Please provide values to to register' ]], 404);
+    }
 
     $user = new User();
     $user
-      ->setFirstName($requestData->firstname)
-      ->setLastName($requestData->lastname)
-      ->setUsername($requestData->username)
-      ->setEmail($requestData->email)
-      ->setPlainPassword($requestData->password)
+      ->setFirstName($requestData['firstname'] ?? '')
+      ->setLastName($requestData['lastname'] ?? '')
+      ->setUsername($requestData['username'] ?? '')
+      ->setEmail($requestData['email'] ?? '')
+      ->setPlainPassword($requestData['password'] ?? '')
     ;
 
     // we will encode user password to argon2i before storing it in the database
@@ -36,9 +39,13 @@ class UserController extends BaseController
     }
 
     // validate user data and if the data is invalid print error message to client side
-    $errors = $this->validator->validate($user);
-    if (count($errors) > 0) {
-      return $this->json([ 'message' => $errors[0]->getMessage() ], 500);
+    $validationErrors = $this->validator->validate($user);
+    if (count($validationErrors) > 0) {
+      $errors = [];
+      foreach ($validationErrors as $error) {
+        $errors[] = $error->getMessage();
+      }
+      return $this->json([ 'message' =>  $errors ], 416);
     }
 
     $this->getDoctrine()->getManager()->persist($user);
