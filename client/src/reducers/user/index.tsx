@@ -2,10 +2,10 @@ import { User } from "../../models/User";
 import { RegisterUserActionTypes } from "../../actions/user";
 import { AnyAction } from "redux";
 
-interface RegisterUserAction {
+export interface RegisterUserState {
   type: string;
-  payload: User;
-  error: string;
+  user: User;
+  error: string[];
 }
 
 export const registerUserReducer = (state: any = null, action: AnyAction) => {
@@ -20,11 +20,13 @@ export const registerUserReducer = (state: any = null, action: AnyAction) => {
         ...state,
         pending: false,
         user: action.payload,
+        error: null,
       };
     case RegisterUserActionTypes.REGISTER_USER_ERROR:
       return {
         ...state,
         pending: false,
+        user: null,
         error: action.error,
       };
     default:

@@ -17,9 +17,13 @@ class AuthController extends BaseController
    */
   public function login(Request $request): JsonResponse
   {
-    $requestData = json_decode($request->getContent());
-    $username = $requestData->username;
-    $password = $requestData->password;
+    $requestData = json_decode($request->getContent(), true);
+    if (count($requestData) <= 0) {
+      return $this->json([ 'message' => 'Please provide values to login' ], 404);
+    }
+
+    $username = $requestData['username'] ?? '';
+    $password = $requestData['password'] ?? '';
 
     $user = $this
       ->getDoctrine()

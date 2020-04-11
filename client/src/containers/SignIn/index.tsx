@@ -1,16 +1,15 @@
 import React from 'react';
-import { Container, Row, Col, Form, FormGroup, InputGroup, Button } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormGroup, InputGroup, Button, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import { login } from '../../actions';
 import { CurrentUserState } from '../../reducers/auth';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 interface SIProps {
     currentUser?: CurrentUserState;
     login: Function;
-    history: any;
 }
 
 interface SIState {
@@ -32,15 +31,15 @@ class SignIn extends React.Component<SIProps, SIState> {
 
     handleSignInSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         const { username, password} = this.state;
-        if (username && password) {
-            this.props.login(username, password);
-        }
+        this.props.login(username, password);
         event.preventDefault();
-
-        this.props.history.push('/');
     }
 
     render() {
+        const auth = this.props.currentUser;
+        if (auth?.currentUser?.isLoggedIn) {
+            return <Redirect to="/" />;
+        }
         return (
             <Container>
                 <Row>
@@ -50,6 +49,15 @@ class SignIn extends React.Component<SIProps, SIState> {
                         </div>
                     </Col>
                 </Row>
+                {auth?.error &&
+                    <Row>
+                        <Col lg={{ span: 6, offset: 3 }}>
+                            <Alert variant='danger'>
+                                Authentication Denied!
+                            </Alert>
+                        </Col>
+                    </Row>
+                }
                 <Row>
                     <Col lg={{ span: 6, offset: 3 }} className="justify-content-md-center">
                         <div className="cg-section">

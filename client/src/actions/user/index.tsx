@@ -20,7 +20,7 @@ export const registerUser = (userPayload: User) => async (dispatch: Dispatch) =>
   } catch (error) {
     dispatch({
       type: RegisterUserActionTypes.REGISTER_USER_ERROR,
-      error: 'Error creating user',
+      error: error?.response?.data?.message,
     });
   }
 }
