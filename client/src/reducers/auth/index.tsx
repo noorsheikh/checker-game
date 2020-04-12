@@ -1,6 +1,6 @@
-import { CurrentUser } from "../../models/CurrentUser";
+import { CurrentUser } from '../../models/CurrentUser';
 import { LoginActions } from '../../actions/auth';
-import { AnyAction } from "redux";
+import { AnyAction } from 'redux';
 
 export interface CurrentUserState {
   pending: boolean;
@@ -9,7 +9,7 @@ export interface CurrentUserState {
 }
 
 export const userLoginReducer = (state: any = null, action: AnyAction) => {
-  switch(action.type) {
+  switch (action.type) {
     case LoginActions.LOGIN_PENDING:
       return {
         ...state,
@@ -32,4 +32,4 @@ export const userLoginReducer = (state: any = null, action: AnyAction) => {
     default:
       return state;
   }
-}
+};
