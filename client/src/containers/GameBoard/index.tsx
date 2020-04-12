@@ -12,10 +12,6 @@ import Pieces from '../../components/Pieces';
 
 // const DEBUG = true;
 
-// function dist(x1: any, y1: any, x2: any, y2: any) {
-//   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-// }
-
 interface BState {
   boardState: number[][];
   player1score: number;
