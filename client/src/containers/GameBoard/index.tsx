@@ -1,160 +1,20 @@
 // GAMEBOARD HTML FROM: https://github.com/codethejason/checkers/blob/master/index.html
-
-import King1 from './img/king1.png';
-import King2 from './img/king2.png';
 import React from 'react';
-
-import './style.scss';
-import { Container, Row, Col, Card, CardGroup, Button, NavLink } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
+import Tile from '../../components/Tile';
+import Piece from '../../components/Piece';
+import GameStats from '../../components/GameStats';
+import { dictionary, dist } from '../../utils';
+import Pieces from '../../components/Pieces';
 
-const DEBUG = true;
-const dictionary = ['0vmin', '10vmin', '20vmin', '30vmin', '40vmin', '50vmin', '60vmin', '70vmin', '80vmin', '90vmin'];
+// const DEBUG = true;
 
-function dist(x1: any, y1: any, x2: any, y2: any) {
-  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-}
-
-function Stats(props: any) {
-  let turnBackground = 'linear-gradient(to right, transparent 50%, #BEEE62 50%)';
-  if (props.playerTurn === 1) {
-    turnBackground = 'linear-gradient(to right, #BEEE62 50%, transparent 50%)';
-  }
-
-  const turnStyle = {
-    background: turnBackground,
-  };
-
-  let p1idx = 0;
-  const p1score: JSX.Element[] = [];
-  while (p1idx < props.player1score) {
-    p1score.push(<p key={p1idx} className="capturedPiece"></p>);
-    p1idx++;
-  }
-
-  let p2idx = 0;
-  const p2score = [];
-  while (p2idx < props.player2score) {
-    p2score.push(<p key={p2idx} className="capturedPiece"></p>);
-    p2idx++;
-  }
-
-  return (
-    <Card className="statistics">
-      <Card.Body>
-        <Card.Title style={{ textAlign: 'center' }}>
-          <strong>Game Statistics</strong>
-          <Card.Link as={Button} style={{ marginLeft: 20 }} href="#">Reset Game</Card.Link>
-        </Card.Title>
-        <div>
-          <CardGroup>
-            <Card className="player1">
-              <Card.Body>
-                <Card.Title>{`${props.player1} (Top)`}</Card.Title>
-                <div>{[p1score]}</div>
-              </Card.Body>
-            </Card>
-            <Card className="player2">
-              <Card.Body>
-                <Card.Title>{`${props.player2} (Bottom)`}</Card.Title>
-                <div>{[p2score]}</div>
-              </Card.Body>
-            </Card>
-          </CardGroup>
-          <div className="turn" style={turnStyle} />
-          {props.winnder && <span className="winner">{props.winner} won!</span>}
-        </div>
-      </Card.Body>
-    </Card>
-  );
-}
-
-const Pieces = (props: any) => {
-  const player1pieces = [];
-  const player2pieces = [];
-
-  for (const idx in props.pieces) {
-    const piece = props.pieces[idx];
-    if (piece.props.player === 1) player1pieces.push(piece);
-    else if (piece.props.player === 2) player2pieces.push(piece);
-  }
-
-  return (
-    <div className="pieces">
-      <div className="player1pieces">{[player1pieces]}</div>
-      <div className="player2pieces">{[player2pieces]}</div>
-    </div>
-  );
-};
-
-interface TProps {
-  position: any;
-  handleClick: Function;
-  id: string;
-}
-
-interface TState {
-  position: any;
-}
-
-class Tile extends React.Component<TProps, TState> {
-  componentDidMount() {
-    this.setState({ position: this.props.position });
-  }
-
-  render() {
-    const style = {
-      top: dictionary[this.props.position?.row],
-      left: dictionary[this.props.position?.column],
-    };
-
-    return (
-      <div
-        className="tile"
-        id={this.props.id}
-        style={style}
-        onClick={() => this.props.handleClick(this.props.position)}
-      />
-    );
-  }
-}
-
-interface PProps {
-  king: boolean;
-  player: number;
-  playerTurn: number;
-  position: any;
-  selected: boolean;
-  handleClick: Function;
-}
-
-class Piece extends React.Component<PProps, {}> {
-  onClick = () => {
-    this.props.handleClick(this.props.player, this.props.position, this.props.king);
-  };
-
-  render() {
-    const style = {
-      top: dictionary[this.props.position?.row],
-      left: dictionary[this.props.position?.column],
-      backgroundImage: '',
-    };
-
-    let className = 'piece';
-    if (this.props.selected && this.props.playerTurn === this.props.player) {
-      className += ' selected';
-    }
-
-    if (this.props.king) {
-      if (this.props.player === 1) style.backgroundImage = 'url(' + King1 + ')';
-      else if (this.props.player === 2) style.backgroundImage = 'url(' + King2 + ')';
-    }
-
-    return <div className={className} style={style} onClick={this.onClick} />;
-  }
-}
+// function dist(x1: any, y1: any, x2: any, y2: any) {
+//   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+// }
 
 interface BState {
   boardState: number[][];
@@ -235,12 +95,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     const row = tilePosition?.row;
     const column = tilePosition?.column;
     if (row < 0 || row > 7 || column < 0 || column > 7) return false;
-    let ret = false;
-    if (this.state.boardState[row][column] === 0) {
-      ret = true;
-    }
-    //if (DEBUG) console.log("isValidPlaceToMove:" + ret);
-    return ret;
+
+    return (this.state.boardState[row][column] === 0) ? true : false;
   };
 
   makeKing = (position: any) => {
@@ -282,8 +138,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       //remove the mark from board and put it in the new spot
       boardState[selectedPiece?.position?.row][selectedPiece?.position?.column] = 0;
 
-      boardState[tilePosition.row][tilePosition.column] = this.getBoardValue(selectedPiece);
-      this.setState({ boardState: boardState });
+      boardState[tilePosition?.row][tilePosition?.column] = this.getBoardValue(selectedPiece);
+      this.setState({ boardState });
       //if piece reaches the end of the row on opposite side crown it a king (can move all directions)
       if (!selectedPiece.king) {
         if (selectedPiece.player === 1) {
@@ -296,7 +152,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   };
 
   removePiece = (position: any) => {
-    if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
+    // if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
     const boardState = this.state.boardState;
     const player = this.state.boardState[position?.row][position?.column];
     if (player === 1) this.setState({ player2score: this.state.player2score + 1 }, () => {});
@@ -308,8 +164,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   inRange = (tilePosition: any) => {
     const { selectedPiece: piece, pieces } = this.state;
     if (piece) {
-      for (const idx in this.pieces) {
-        const k = this.pieces[idx];
+      for (const idx in pieces) {
+        const k = pieces[idx];
         if (k.props.position?.row === tilePosition.row && k.props.position?.column === tilePosition?.column)
           return 'wrong';
       }
@@ -373,8 +229,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         !this.isValidPlaceToMove({ row: tileToCheckx, colmn: tileToChecky }) &&
         this.isValidPlaceToMove({ row: newPosition.row, column: newPosition.column })
       ) {
-        for (const pieceIndex in this.pieces) {
-          const thisPiece = this.pieces[pieceIndex].props;
+        for (const pieceIndex in pieces) {
+          const thisPiece = pieces[pieceIndex].props;
           if (thisPiece?.position?.row === tileToChecky && thisPiece?.position?.column === tileToCheckx) {
             if (piece.player !== thisPiece.player) {
               //return the piece sitting there
@@ -400,8 +256,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   };
 
   onTileClick = (tilePosition: any) => {
-    if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
-
+    // if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
     const inRange = this.inRange(tilePosition);
     if (inRange !== 'wrong') {
       if (inRange === 'jump') {
@@ -432,10 +287,11 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         }
       }
     }
+    this.handlePiecesUpdate(this.pieces);
   };
 
   onPieceClick = (player: any, position: any, king: any) => {
-    if (DEBUG) console.log('onPieceClick:' + JSON.stringify({ player, position, king }));
+    // if (DEBUG) console.log('onPieceClick:' + JSON.stringify({ player, position, king }));
 
     if (this.state.playerTurn === player) {
       const piecesThatCanJump = [];
@@ -459,15 +315,15 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           }
         }
       }
-      let selectedPieceCanJump = false;
-      for (const idx in piecesThatCanJump) {
-        const jumpablePiece = piecesThatCanJump[idx];
-        console.log(jumpablePiece);
-        console.log(position);
-        if (jumpablePiece?.position?.row === position?.row && jumpablePiece?.position?.column === position?.column) {
-          selectedPieceCanJump = true;
-        }
-      }
+
+      // Comment by Noor: Not sure what this is for, I do not see any use of it. Should it be removed?
+      // let selectedPieceCanJump = false;
+      // for (const idx in piecesThatCanJump) {
+      //   const jumpablePiece = piecesThatCanJump[idx];
+      //   if (jumpablePiece?.position?.row === position?.row && jumpablePiece?.position?.column === position?.column) {
+      //     selectedPieceCanJump = true;
+      //   }
+      // }
 
       const selectedPiece = this.state?.selectedPiece;
       if (selectedPiece !== null) {
@@ -480,15 +336,16 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         this.setState({ selectedPiece: { player, position, king } });
       }
     }
+    this.handlePiecesUpdate(this.pieces);
   };
 
   handlePiecesUpdate = (pieces: any) => {
     this.setState({ pieces });
   };
 
-  componentWillReceiveProps() {
-    this.handlePiecesUpdate(this.pieces);
-  }
+  resetBoard = () => {
+    window.location.reload();
+  };
 
   render() {
     const tiles = [];
@@ -523,8 +380,13 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           }
         }
 
+        const style = {
+          top: dictionary[position?.row],
+          left: dictionary[position?.column],
+        };
+
         if (validTile) {
-          tiles.push(<Tile key={tileID} id={tileID} position={position} handleClick={this.onTileClick} />);
+          tiles.push(<Tile key={tileID} position={position} handleClick={this.onTileClick} style={style} />);
 
           if (this.state.boardState[row][column] !== 0) {
             let player = 1;
@@ -547,6 +409,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
                 selected={selected}
                 playerTurn={this.state.playerTurn}
                 handleClick={this.onPieceClick}
+                dictionary={dictionary}
               />
             );
             pieces.push(piece);
@@ -570,13 +433,14 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           <Container>
             <Row>
               <Col>
-                <Stats
+                <GameStats
                   playerTurn={this.state.playerTurn}
                   player1="Player 1"
                   player2="Player 2"
                   player1score={this.state.player1score}
                   player2score={this.state.player2score}
                   winner={winner}
+                  resetBoard={this.resetBoard}
                 />
               </Col>
             </Row>
