@@ -5,7 +5,7 @@ import King2 from './img/king2.png';
 import React from 'react';
 
 import './style.scss';
-import { Container, Row, Col, Card, CardGroup, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, CardGroup, Button, NavLink } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
@@ -44,7 +44,10 @@ function Stats(props: any) {
   return (
     <Card className="statistics">
       <Card.Body>
-        <Card.Title style={{ textAlign: 'center' }}>Game Statistics</Card.Title>
+        <Card.Title style={{ textAlign: 'center' }}>
+          <strong>Game Statistics</strong>
+          <Card.Link as={Button} style={{ marginLeft: 20 }} href="#">Reset Game</Card.Link>
+        </Card.Title>
         <div>
           <CardGroup>
             <Card className="player1">
@@ -62,7 +65,6 @@ function Stats(props: any) {
           </CardGroup>
           <div className="turn" style={turnStyle} />
           {props.winnder && <span className="winner">{props.winner} won!</span>}
-          <Button variant="primary" className='reset-game'>Reset Game</Button>
         </div>
       </Card.Body>
     </Card>
@@ -297,8 +299,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
     const boardState = this.state.boardState;
     const player = this.state.boardState[position?.row][position?.column];
-    if (player === 1) this.setState({ player2score: this.state.player2score + 1 });
-    else if (player === 2) this.setState({ player1score: this.state.player1score + 1 });
+    if (player === 1) this.setState({ player2score: this.state.player2score + 1 }, () => {});
+    else if (player === 2) this.setState({ player1score: this.state.player1score + 1 }, () => {});
     boardState[position?.row][position?.column] = 0;
     this.setState({ boardState: boardState });
   };
