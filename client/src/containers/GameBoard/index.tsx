@@ -5,7 +5,7 @@ import King2 from './img/king2.png';
 import React from 'react';
 
 import './style.scss';
-import { Container, Row, Col, Card, CardGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, CardGroup, Button } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
@@ -41,7 +41,7 @@ function Stats(props: any) {
     p2idx++;
   }
 
-  const winner = props.winner === undefined ? undefined : <span id="winner">{props.winner} won!</span>;
+  // const winner = props.winner && <span className="winner">{props.winner} won!</span>;
 
   return (
     <Card className="statistics">
@@ -63,7 +63,8 @@ function Stats(props: any) {
             </Card>
           </CardGroup>
           <div className="turn" style={turnStyle} />
-          {winner}
+          {props.winnder && <span className="winner">{props.winner} won!</span>}
+          <Button variant="primary" className='reset-game'>Reset Game</Button>
         </div>
       </Card.Body>
     </Card>
@@ -467,11 +468,6 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           selectedPieceCanJump = true;
         }
       }
-
-      // if (!selectedPieceCanJump) {
-      //   alert("You must jump when possible and this piece can't jump!");
-      //   return;
-      // }
 
       const selectedPiece = this.state?.selectedPiece;
       if (selectedPiece !== null) {
