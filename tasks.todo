@@ -12,6 +12,8 @@
   ✔ Add input validation for login form @done (4/10/2020, 10:22:38 PM)
   ✔ Add input validation for user registration form @done (4/10/2020, 10:22:39 PM)
   ✔ Add login and registration successfull redirects @done (4/10/2020, 10:22:40 PM)
+  ✔ Refactor GameBoard and split it into components @done (4/12/2020, 2:57:28 AM)
+  ✔ Fix issues related to GameBoard @done (4/12/2020, 2:57:29 AM)
 
 
 

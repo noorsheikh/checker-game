@@ -5,9 +5,8 @@ import { Dispatch } from 'redux';
 export enum RegisterUserActionTypes {
   REGISTER_USER_PENDING = 'REGISTER_USER_PENDING',
   REGISTER_USER_SUCCESS = 'REGISTER_USER_SUCCESS',
-  REGISTER_USER_ERROR = 'REGISTER_USER_ERROR'
+  REGISTER_USER_ERROR = 'REGISTER_USER_ERROR',
 }
-
 
 export const registerUser = (userPayload: User) => async (dispatch: Dispatch) => {
   dispatch({ type: RegisterUserActionTypes.REGISTER_USER_PENDING });
@@ -15,7 +14,7 @@ export const registerUser = (userPayload: User) => async (dispatch: Dispatch) =>
     const user = await axios.post(`http://localhost:80/api/user/register`, userPayload);
     dispatch({
       type: RegisterUserActionTypes.REGISTER_USER_SUCCESS,
-      payload: user
+      payload: user,
     });
   } catch (error) {
     dispatch({
@@ -23,4 +22,4 @@ export const registerUser = (userPayload: User) => async (dispatch: Dispatch) =>
       error: error?.response?.data?.message,
     });
   }
-}
+};

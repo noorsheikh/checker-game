@@ -31,5 +31,6 @@ $h6-font-size: $font-size-base * .8;
 // Containers SCSS Styles
 @import "./containers/Home/Home.scss";
 @import "./containers/SignIn/SignIn.scss";
+@import "./containers/GameBoard/GameBoard.scss";
 
 @import "./App.scss";

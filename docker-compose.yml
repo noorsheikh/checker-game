@@ -10,17 +10,16 @@ services:
       - ./client/package.json:/client/package.json
       - ./client/yarn.lock:/client/yarn.lock
       - ./client/tsconfig.json:/client/tsconfig.json
-      - ./client/client.key:/client/client.key
-      - ./client/client.crt:/client/client.crt
+      - ./client/.eslintrc.js:/client/.eslintrc.js
     ports:
       - 3000:3000
     depends_on:
       - server
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - HTTPS=true
-      - SSL_KEY_FILE=client.key
-      - SSL_CRT_FILE=client.crt
+      # - HTTPS=true
+      # - SSL_KEY_FILE=client.key
+      # - SSL_CRT_FILE=client.crt
     networks:
       checker_game:
     tty: true

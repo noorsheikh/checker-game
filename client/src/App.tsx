@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
 
-import GameBoard from './containers/GameBoard/GameBoard';
+import GameBoard from './containers/GameBoard';
 import Home from './containers/Home';
 import SignIn from './containers/SignIn';
 import SignUp from './containers/SignUp';
@@ -14,10 +14,7 @@ class App extends React.Component<{}, {}> {
   render() {
     return (
       <Provider store={store}>
-        <PersistGate
-          persistor={persistor}
-          loading={null}
-        >
+        <PersistGate persistor={persistor} loading={null}>
           <Router>
             <Route path="/" exact component={Home} />
             <Route path="/sign-in" exact component={SignIn} />
@@ -26,7 +23,7 @@ class App extends React.Component<{}, {}> {
           </Router>
         </PersistGate>
       </Provider>
-    )
+    );
   }
 }
 
