@@ -41,8 +41,6 @@ function Stats(props: any) {
     p2idx++;
   }
 
-  // const winner = props.winner && <span className="winner">{props.winner} won!</span>;
-
   return (
     <Card className="statistics">
       <Card.Body>
@@ -172,9 +170,9 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   state = {
     boardState: [
       [0, 1, 0, 1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 1, 0, 2, 0],
+      [1, 0, 1, 0, 1, 0, 1, 0],
       [0, 1, 0, 1, 0, 1, 0, 1],
-      [0, 0, 0, 0, 2, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
       [2, 0, 2, 0, 2, 0, 2, 0],
       [0, 0, 0, 2, 0, 2, 0, 2],
