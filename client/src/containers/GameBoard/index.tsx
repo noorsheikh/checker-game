@@ -18,7 +18,6 @@ interface BState {
   player2score: number;
   playerTurn: number;
   selectedPiece: { [key: string]: any };
-  pieces: { [key: string]: any }[];
   interval: any;
   currentUser: CurrentUserState;
 }
