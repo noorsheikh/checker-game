@@ -8,6 +8,7 @@ interface GProps {
   player1: string;
   player2: string;
   winner?: string;
+  alert: string;
 }
 
 const GameStats: React.FC<GProps> = (props: GProps) => {
@@ -57,6 +58,7 @@ const GameStats: React.FC<GProps> = (props: GProps) => {
           </CardGroup>
           <div className="turn" style={turnStyle} />
           {props.winner && <span className="winner">{props.winner} won!</span>}
+          {props.alert && <span className="alert">{props.alert}</span>}
         </div>
       </Card.Body>
     </Card>

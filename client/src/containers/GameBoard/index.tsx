@@ -20,6 +20,7 @@ interface BState {
   selectedPiece: { [key: string]: any };
   interval: any;
   currentUser: CurrentUserState;
+  alert: string;
 }
 
 class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BState> {
@@ -58,6 +59,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     ],
     interval: undefined,
     currentUser: {} as CurrentUserState,
+    alert: ""
   };
 
   pieces = [
@@ -280,8 +282,9 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         if (!this.canJumpAny(this.state.selectedPiece)) {
           this.movePiece(tilePosition);
           this.toggleTurn();
+          this.setState({ alert: "" });
         } else {
-          alert('You must jump when possible!');
+          this.setState({ alert: "You must jump when possible!" });
         }
       }
     }
@@ -322,9 +325,10 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       }
 
       if (!selectedPieceCanJump && piecesThatCanJump.length > 0) {
-        alert("You must jump when possible and this piece can't jump!");
+        this.setState({ alert: "You must jump when possible and this piece can't jump!" });
         return;
       }
+      this.setState({ alert: "" });
 
       const selectedPiece = this.state?.selectedPiece;
       if (selectedPiece !== null) {
@@ -336,6 +340,9 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       } else {
         this.setState({ selectedPiece: { player, position, king } });
       }
+    }
+    else {
+      this.setState({ alert: "It is not your turn." });
     }
   };
 
@@ -432,6 +439,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
                   player1score={this.state.player1score}
                   player2score={this.state.player2score}
                   winner={winner}
+                  alert={this.state.alert}
                 />
               </Col>
               <Col>
