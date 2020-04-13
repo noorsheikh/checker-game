@@ -1,14 +1,14 @@
 import React from 'react';
-import { Card, CardGroup, Button } from 'react-bootstrap';
+import { Card, CardGroup } from 'react-bootstrap';
 
 interface GProps {
   playerTurn: number;
   player1score: number;
   player2score: number;
-  resetBoard: Function;
   player1: string;
   player2: string;
   winner?: string;
+  alert: string;
 }
 
 const GameStats: React.FC<GProps> = (props: GProps) => {
@@ -39,10 +39,7 @@ const GameStats: React.FC<GProps> = (props: GProps) => {
     <Card className="statistics">
       <Card.Body>
         <Card.Title style={{ textAlign: 'center' }}>
-          <strong>Game Statistics</strong>
-          <Card.Link as={Button} style={{ marginLeft: 20 }} onClick={props.resetBoard}>
-            Reset Game
-          </Card.Link>
+          <strong>Statistics</strong>
         </Card.Title>
         <div>
           <CardGroup>
@@ -61,6 +58,7 @@ const GameStats: React.FC<GProps> = (props: GProps) => {
           </CardGroup>
           <div className="turn" style={turnStyle} />
           {props.winner && <span className="winner">{props.winner} won!</span>}
+          {props.alert && <span className="alert">{props.alert}</span>}
         </div>
       </Card.Body>
     </Card>

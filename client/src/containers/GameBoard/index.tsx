@@ -17,11 +17,10 @@ interface BState {
   player1score: number;
   player2score: number;
   playerTurn: number;
-  jumpExist: boolean;
   selectedPiece: { [key: string]: any };
-  pieces: { [key: string]: any }[];
   interval: any;
   currentUser: CurrentUserState;
+  alert: string;
 }
 
 class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BState> {
@@ -33,13 +32,12 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       [0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0],
       [2, 0, 2, 0, 2, 0, 2, 0],
-      [0, 0, 0, 2, 0, 2, 0, 2],
+      [0, 2, 0, 2, 0, 2, 0, 2],
       [2, 0, 2, 0, 2, 0, 2, 0],
     ],
     player1score: 0,
     player2score: 0,
     playerTurn: 1,
-    jumpExist: false,
     selectedPiece: {
       king: null,
       player: null,
@@ -61,6 +59,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     ],
     interval: undefined,
     currentUser: {} as CurrentUserState,
+    alert: ""
   };
 
   pieces = [
@@ -102,7 +101,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     } else if (boardState[position?.row][position?.column] === 2) {
       boardState[position?.row][position?.column] = 4;
     }
-    this.setState({ boardState: boardState });
+    this.updateGameBoard(boardState);
   };
 
   getBoardValue = (selectedPiece: any) => {
@@ -154,7 +153,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     if (player === 1) this.setState({ player2score: this.state.player2score + 1 }, () => {});
     else if (player === 2) this.setState({ player1score: this.state.player1score + 1 }, () => {});
     boardState[position?.row][position?.column] = 0;
-    this.setState({ boardState: boardState });
+    this.updateGameBoard(boardState);
   };
 
   inRange = (tilePosition: any) => {
@@ -195,7 +194,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   };
 
   canOpponentJump = (piece: any, newPosition: any) => {
-    const { pieces } = this.state;
+    const pieces = this.pieces;
     if (piece) {
       //find what the displacement is
       const dx = newPosition?.column - piece?.position?.column;
@@ -214,8 +213,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       }
 
       //middle tile where the piece to be conquered sits
-      const tileToCheckx = piece?.position?.column + dx / 2;
-      const tileToChecky = piece?.position?.row + dy / 2;
+      const tileToCheckx = piece?.position?.column + (dx / 2);
+      const tileToChecky = piece?.position?.row + (dy / 2);
       if (tileToCheckx > 7 || tileToChecky > 7 || tileToCheckx < 0 || tileToChecky < 0) {
         return false;
       }
@@ -251,6 +250,11 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     return false;
   };
 
+  updateGameBoard = (boardState: number[][]) => {
+    this.setState({ boardState: boardState });
+    // TODO: Send state to server
+  }
+
   onTileClick = (tilePosition: any) => {
     // if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
     const inRange = this.inRange(tilePosition);
@@ -274,16 +278,16 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
             this.toggleTurn();
           }
         }
-      } else if (inRange === 'regular' && !this.state.jumpExist) {
+      } else if (inRange === 'regular') {
         if (!this.canJumpAny(this.state.selectedPiece)) {
           this.movePiece(tilePosition);
           this.toggleTurn();
+          this.setState({ alert: "" });
         } else {
-          alert('You must jump when possible!');
+          this.setState({ alert: "You must jump when possible!" });
         }
       }
     }
-    this.handlePiecesUpdate(this.pieces);
   };
 
   onPieceClick = (player: any, position: any, king: any) => {
@@ -294,7 +298,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       for (let row = 0; row < 8; row++) {
         for (let column = 0; column < 8; column++) {
           const boardValue = this.state.boardState[row][column];
-          if (boardValue !== 0) {
+          if (boardValue !== 0 && boardValue === this.state.playerTurn) {
             let boardPlayer = 1;
             let boardKing = false;
             if (boardValue === 2) boardPlayer = 2;
@@ -312,14 +316,19 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         }
       }
 
-      // Comment by Noor: Not sure what this is for, I do not see any use of it. Should it be removed?
-      // let selectedPieceCanJump = false;
-      // for (const idx in piecesThatCanJump) {
-      //   const jumpablePiece = piecesThatCanJump[idx];
-      //   if (jumpablePiece?.position?.row === position?.row && jumpablePiece?.position?.column === position?.column) {
-      //     selectedPieceCanJump = true;
-      //   }
-      // }
+      let selectedPieceCanJump = false;
+      for (const idx in piecesThatCanJump) {
+        const jumpablePiece = piecesThatCanJump[idx];
+        if (jumpablePiece?.position?.row === position?.row && jumpablePiece?.position?.column === position?.column) {
+          selectedPieceCanJump = true;
+        }
+      }
+
+      if (!selectedPieceCanJump && piecesThatCanJump.length > 0) {
+        this.setState({ alert: "You must jump when possible and this piece can't jump!" });
+        return;
+      }
+      this.setState({ alert: "" });
 
       const selectedPiece = this.state?.selectedPiece;
       if (selectedPiece !== null) {
@@ -332,15 +341,9 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         this.setState({ selectedPiece: { player, position, king } });
       }
     }
-    this.handlePiecesUpdate(this.pieces);
-  };
-
-  handlePiecesUpdate = (pieces: any) => {
-    this.setState({ pieces });
-  };
-
-  resetBoard = () => {
-    window.location.reload();
+    else {
+      this.setState({ alert: "It is not your turn." });
+    }
   };
 
   render() {
@@ -428,7 +431,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           <Header {...currentUser} />
           <Container>
             <Row>
-              <Col>
+              <Col lg={4}>
                 <GameStats
                   playerTurn={this.state.playerTurn}
                   player1="Player 1"
@@ -436,17 +439,13 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
                   player1score={this.state.player1score}
                   player2score={this.state.player2score}
                   winner={winner}
-                  resetBoard={this.resetBoard}
+                  alert={this.state.alert}
                 />
               </Col>
-            </Row>
-            <Row>
-              <Col>
-                <div className="column">
-                  <div className="board">
-                    {[tiles]}
-                    <Pieces pieces={pieces} />
-                  </div>
+              <Col lg={8}>
+                <div className="board" >
+                  {[tiles]}
+                  <Pieces pieces={pieces} />
                 </div>
               </Col>
             </Row>

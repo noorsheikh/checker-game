@@ -1,14 +1,14 @@
 export const dictionary = [
   '0vmin',
-  '10vmin',
-  '20vmin',
-  '30vmin',
+  '8vmin',
+  '16vmin',
+  '24vmin',
+  '32vmin',
   '40vmin',
-  '50vmin',
-  '60vmin',
-  '70vmin',
-  '80vmin',
-  '90vmin',
+  '48vmin',
+  '56vmin',
+  '64vmin',
+  '72vmin',
 ];
 
 export const dist = (x1: any, y1: any, x2: any, y2: any) =>
