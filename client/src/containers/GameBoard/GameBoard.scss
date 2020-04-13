@@ -10,8 +10,8 @@ $fontColor: #333333;
 $shadow: 1px 1px 3px $dark;
 
 @mixin gamePiece($color, $factor) {
-  width: 8vmin * $factor;
-  height: 8vmin * $factor;
+  width: 6vmin * $factor;
+  height: 6vmin * $factor;
   background: {
     color: $color;
     size: 65%;
@@ -100,17 +100,17 @@ div.info {
 div.board {
   position: absolute;
   // top: calc(50% - 40vmin);
-  left: calc(50% - 40vmin);
-  width: 80vmin;
-  height: 80vmin;
+  right: calc(50% - 40vmin);
+  width: 64vmin;
+  height: 64vmin;
   border-radius: 5px;
   box-shadow: $shadow;
   background-color: $red;
   overflow: hidden; //to maintain rounded corners
 
   .tile {
-    width: 10vmin;
-    height: 10vmin;
+    width: 8vmin;
+    height: 8vmin;
     position: absolute;
     background-color: $dark;
   }

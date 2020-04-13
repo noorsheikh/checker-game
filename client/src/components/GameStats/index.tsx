@@ -38,7 +38,7 @@ const GameStats: React.FC<GProps> = (props: GProps) => {
     <Card className="statistics">
       <Card.Body>
         <Card.Title style={{ textAlign: 'center' }}>
-          <strong>Game Statistics</strong>
+          <strong>Statistics</strong>
         </Card.Title>
         <div>
           <CardGroup>

@@ -425,7 +425,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           <Container>
             <Row>
               <Col>
-                <GameStats
+              <GameStats
                   playerTurn={this.state.playerTurn}
                   player1="Player 1"
                   player2="Player 2"
@@ -434,8 +434,6 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
                   winner={winner}
                 />
               </Col>
-            </Row>
-            <Row>
               <Col>
                 <div className="column">
                   <div className="board">
