@@ -149,9 +149,9 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   removePiece = (position: any) => {
     // if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
     const boardState = this.state.boardState;
-    const player = this.state.boardState[position?.row][position?.column];
-    if (player === 1) this.setState({ player2score: this.state.player2score + 1 }, () => {});
-    else if (player === 2) this.setState({ player1score: this.state.player1score + 1 }, () => {});
+    const boardValue = this.state.boardState[position?.row][position?.column];
+    if (boardValue === 1 || player === 3) this.setState({ player2score: this.state.player2score + 1 }, () => {});
+    else if (boardValue === 2 || player === 4) this.setState({ player1score: this.state.player1score + 1 }, () => {});
     boardState[position?.row][position?.column] = 0;
     this.updateGameBoard(boardState);
   };
