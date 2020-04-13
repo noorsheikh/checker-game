@@ -106,7 +106,8 @@ div.info {
 div.board {
   position: absolute;
   // top: calc(50% - 40vmin);
-  right: calc(50% - 40vmin);
+  // left: calc(50% - 40vmin);
+  margin-top: 1rem;
   width: 64vmin;
   height: 64vmin;
   border-radius: 5px;
