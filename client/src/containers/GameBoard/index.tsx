@@ -339,10 +339,6 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     }
   };
 
-  resetBoard = () => {
-    window.location.reload();
-  };
-
   render() {
     const tiles = [];
     const pieces = [];
@@ -436,7 +432,6 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
                   player1score={this.state.player1score}
                   player2score={this.state.player2score}
                   winner={winner}
-                  resetBoard={this.resetBoard}
                 />
               </Col>
             </Row>
