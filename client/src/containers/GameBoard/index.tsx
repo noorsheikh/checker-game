@@ -17,7 +17,7 @@ interface BState {
   player1score: number;
   player2score: number;
   playerTurn: number;
-  selectedPiece: { [key: string]: any };
+  selectedPiece: object;
   interval: any;
   currentUser: CurrentUserState;
   alert: string;
@@ -155,6 +155,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           if (tilePosition.row === 0) this.makeKing(tilePosition);
         }
       }
+      this.setState({ selectedPiece: {} });
     }
   };
 
@@ -171,7 +172,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   };
 
   inRange = (tilePosition: any) => {
-    const { selectedPiece: piece, pieces } = this.state;
+    const piece = this.state.selectedPiece;
+    const pieces = this.pieces;
     if (piece) {
       for (const idx in pieces) {
         const k = pieces[idx];
@@ -309,6 +311,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
 
   onTileClick = (tilePosition: any) => {
     // if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
+    console.log(JSON.stringify(this.state.selectedPiece));
     const inRange = this.inRange(tilePosition);
     if (inRange !== 'wrong') {
       this.updateAlertState("");
@@ -325,9 +328,10 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
             player = 2;
             king = true;
           }
-          this.setState({ selectedPiece: { position: tilePosition, player, king } });
           if (!this.canJumpAny({ position: tilePosition, player, king })) {
             this.toggleTurn();
+          } else {
+            this.setState({ selectedPiece: { position: tilePosition, player, king } });
           }
         }
         else {
@@ -352,7 +356,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       if (this.state.winner.length > 0) {
         this.updateAlertState("The game is over.");
       } else {
-        if (this.state.selectedPiece) {
+        if (Object.keys(this.state.selectedPiece).length !== 0) {
           this.updateAlertState("Not a valid move.");
         } else {
           this.updateAlertState("No piece selected.");
