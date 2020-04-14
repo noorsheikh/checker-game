@@ -255,6 +255,12 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     // TODO: Send state to server
   }
 
+  boardValueMatchesPlayerTurn = (boardValue: number) => {
+    if ((boardValue === 1 || boardValue === 3) && this.state.playerTurn === 1) return true;
+    else if ((boardValue === 2 || boardValue === 4) && this.state.playerTurn === 2) return true;
+    return false;
+  }
+
   onTileClick = (tilePosition: any) => {
     // if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
     const inRange = this.inRange(tilePosition);
@@ -298,7 +304,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       for (let row = 0; row < 8; row++) {
         for (let column = 0; column < 8; column++) {
           const boardValue = this.state.boardState[row][column];
-          if (boardValue !== 0) {
+          if (boardValue !== 0 && this.boardValueMatchesPlayerTurn(boardValue)) {
             let boardPlayer = 1;
             let boardKing = false;
             if (boardValue === 2) boardPlayer = 2;
