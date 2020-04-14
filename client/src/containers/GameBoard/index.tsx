@@ -228,10 +228,9 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         for (const pieceIndex in pieces) {
           const thisPiece = pieces[pieceIndex].props;
           if (thisPiece?.position?.row === tileToChecky && thisPiece?.position?.column === tileToCheckx) {
-            if (piece.player !== thisPiece.player) {
+            if (piece.player !== thisPiece.player && this.state.boardState[tileToChecky][tileToCheckx] !== 0) {
               //return the piece sitting there
               const ret = thisPiece?.position;
-
               //if (DEBUG) console.log("canOpponentJump:" + JSON.stringify(ret));
               return ret;
             }
@@ -291,7 +290,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       } else if (inRange === 'regular') {
         if (!this.canJumpAny(this.state.selectedPiece)) {
           this.setState({ alert: "" });
-          if (this.state.boardState[tilePosition.row][tilePosition.column] === 0) {
+          if (this.isValidPlaceToMove(tilePosition)) {
             this.setState({ alert: "" });
             this.movePiece(tilePosition);
             this.toggleTurn();
