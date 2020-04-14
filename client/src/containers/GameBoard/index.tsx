@@ -215,6 +215,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       //middle tile where the piece to be conquered sits
       const tileToCheckx = piece?.position?.column + (dx / 2);
       const tileToChecky = piece?.position?.row + (dy / 2);
+
       if (tileToCheckx > 7 || tileToChecky > 7 || tileToCheckx < 0 || tileToChecky < 0) {
         return false;
       }
@@ -265,8 +266,10 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     // if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
     const inRange = this.inRange(tilePosition);
     if (inRange !== 'wrong') {
+      this.setState({ alert: "" });
       if (inRange === 'jump') {
         if (this.opponentJump(tilePosition)) {
+          this.setState({ alert: "" });
           this.movePiece(tilePosition);
           const value = this.state.boardState[tilePosition.row][tilePosition.column];
           let player = 1;
@@ -278,21 +281,30 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
             king = true;
           }
           this.setState({ selectedPiece: { position: tilePosition, player, king } });
-          if (this.canJumpAny({ position: tilePosition, player, king })) {
-            // continuous jump
-          } else {
+          if (!this.canJumpAny({ position: tilePosition, player, king })) {
             this.toggleTurn();
           }
         }
+        else {
+          this.setState({ alert: "Can't jump your own piece." });
+        }
       } else if (inRange === 'regular') {
         if (!this.canJumpAny(this.state.selectedPiece)) {
-          this.movePiece(tilePosition);
-          this.toggleTurn();
           this.setState({ alert: "" });
+          if (this.state.boardState[tilePosition.row][tilePosition.column] === 0) {
+            this.setState({ alert: "" });
+            this.movePiece(tilePosition);
+            this.toggleTurn();
+          } else {
+            this.setState({ alert: "There is already a piece there." });
+          }
         } else {
-          this.setState({ alert: "You must jump when possible!" });
+          this.setState({ alert: "You must jump when possible." });
         }
       }
+    }
+    else {
+      this.setState({ alert: "Not a valid move." });
     }
   };
 
@@ -331,7 +343,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       }
 
       if (!selectedPieceCanJump && piecesThatCanJump.length > 0) {
-        this.setState({ alert: "You must jump when possible and this piece can't jump!" });
+        this.setState({ alert: "You must jump when possible and this piece can't jump." });
         return;
       }
       this.setState({ alert: "" });
