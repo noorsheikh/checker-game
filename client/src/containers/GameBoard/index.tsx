@@ -22,6 +22,7 @@ interface BState {
   currentUser: CurrentUserState;
   alert: string;
   winner: string;
+  locked: boolean;
 }
 
 class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BState> {
@@ -63,7 +64,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     interval: undefined,
     currentUser: {} as CurrentUserState,
     alert: "",
-    winner: ""
+    winner: "",
+    locked: false
   };
 
   pieces = [
@@ -277,6 +279,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     }
 
     if (winner) {
+      this.setState({ locked: true });
       // TODO: Declare winner on server
     }
   }
@@ -290,6 +293,14 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     // TODO: Send state and scores to server
   }
 
+  updateAlertState = (alert: string) => {
+    if (!this.state.locked) {
+      this.setState({ alert });
+    } else {
+      this.setState({ alert: "" });
+    }
+  }
+
   boardValueMatchesPlayerTurn = (boardValue: number) => {
     if ((boardValue === 1 || boardValue === 3) && this.state.playerTurn === 1) return true;
     else if ((boardValue === 2 || boardValue === 4) && this.state.playerTurn === 2) return true;
@@ -300,10 +311,10 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     // if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
     const inRange = this.inRange(tilePosition);
     if (inRange !== 'wrong') {
-      this.setState({ alert: "" });
+      this.updateAlertState("");
       if (inRange === 'jump') {
         if (this.opponentJump(tilePosition)) {
-          this.setState({ alert: "" });
+          this.updateAlertState("");
           this.movePiece(tilePosition);
           const value = this.state.boardState[tilePosition.row][tilePosition.column];
           let player = 1;
@@ -320,28 +331,32 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
           }
         }
         else {
-          this.setState({ alert: "Not a valid jump." });
+          this.updateAlertState("Not a valid jump.");
         }
       } else if (inRange === 'regular') {
         if (!this.canJumpAny(this.state.selectedPiece)) {
-          this.setState({ alert: "" });
+          this.updateAlertState("");
           if (this.isValidPlaceToMove(tilePosition)) {
-            this.setState({ alert: "" });
+            this.updateAlertState("");
             this.movePiece(tilePosition);
             this.toggleTurn();
           } else {
-            this.setState({ alert: "There is already a piece there." });
+            this.updateAlertState("There is already a piece there.");
           }
         } else {
-          this.setState({ alert: "You must jump when possible." });
+          this.updateAlertState("You must jump when possible.");
         }
       }
     }
     else {
       if (this.state.winner.length > 0) {
-        this.setState({ alert: "The game is over." });
+        this.updateAlertState("The game is over.");
       } else {
-        this.setState({ alert: "Not a valid move." });
+        if (this.state.selectedPiece) {
+          this.updateAlertState("Not a valid move.");
+        } else {
+          this.updateAlertState("No piece selected.");
+        }
       }
     }
   };
@@ -349,7 +364,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   onPieceClick = (player: any, position: any, king: any) => {
     // if (DEBUG) console.log('onPieceClick:' + JSON.stringify({ player, position, king }));
 
-    if (this.state.playerTurn === player && this.state.winner.length === 0) {
+    if (this.state.playerTurn === player && !this.state.locked) {
       const piecesThatCanJump = [];
       for (let row = 0; row < 8; row++) {
         for (let column = 0; column < 8; column++) {
@@ -381,10 +396,10 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       }
 
       if (!selectedPieceCanJump && piecesThatCanJump.length > 0) {
-        this.setState({ alert: "You must jump when possible and this piece can't jump." });
+        this.updateAlertState("You must jump when possible and this piece can't jump.");
         return;
       }
-      this.setState({ alert: "" });
+      this.updateAlertState("");
 
       const selectedPiece = this.state?.selectedPiece;
       if (selectedPiece !== null) {
@@ -399,10 +414,10 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     }
     else {
       if (this.state.winner.length > 0) {
-        this.setState({ alert: "The game is over." });
+        this.updateAlertState("The game is over.");
       }
       else if (this.state.playerTurn !== player) {
-        this.setState({ alert: "It is not your turn." });
+        this.updateAlertState("It is not your turn.");
       }
     }
   };
