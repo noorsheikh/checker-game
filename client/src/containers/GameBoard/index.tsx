@@ -36,6 +36,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       [0, 2, 0, 2, 0, 2, 0, 2],
       [2, 0, 2, 0, 2, 0, 2, 0],
     ],
+    player1: "Player 1",
+    player2: "Player 2",
     player1score: 0,
     player2score: 0,
     playerTurn: 1,
@@ -79,9 +81,11 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
   tick = () => {
     // TODO: Pull game board state from server and update state only if state differs from server data
     // set boardState
-    // set playerTurn
+    // set player1
+    // set player2
     // set player1score
     // set player2score
+    // set playerTurn
   };
 
   componentDidMount() {
@@ -484,8 +488,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
               <Col lg={4}>
                 <GameStats
                   playerTurn={this.state.playerTurn}
-                  player1="Player 1"
-                  player2="Player 2"
+                  player1={this.state.player1}
+                  player2={this.state.player2}
                   player1score={this.state.player1score}
                   player2score={this.state.player2score}
                   winner={this.state.winner}
