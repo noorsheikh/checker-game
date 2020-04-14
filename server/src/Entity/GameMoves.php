@@ -38,6 +38,16 @@ class GameMoves
      */
     private $timestamp;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $player1score;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $player2score;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -87,6 +97,30 @@ class GameMoves
     public function setTimestamp(\DateTimeInterface $timestamp): self
     {
         $this->timestamp = $timestamp;
+
+        return $this;
+    }
+
+    public function getPlayer1score(): ?int
+    {
+        return $this->player1score;
+    }
+
+    public function setPlayer1score(int $player1score): self
+    {
+        $this->player1score = $player1score;
+
+        return $this;
+    }
+
+    public function getPlayer2score(): ?int
+    {
+        return $this->player2score;
+    }
+
+    public function setPlayer2score(int $player2score): self
+    {
+        $this->player2score = $player2score;
 
         return $this;
     }
