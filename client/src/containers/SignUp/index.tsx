@@ -145,7 +145,7 @@ class SignUp extends React.Component<SIProps, SIState> {
                 <div className="cg-section__form--action">
                   <div className="cg-section__form--action-link">
                     <span className="cg-section__form--action-link-text">Already have an account: </span>
-                    <Link to="/sign-in">Sign In</Link>
+                    <Link to="/">Sign In</Link>
                   </div>
                   <Button type="submit" className="cg-section__form--action-submit">
                     Register

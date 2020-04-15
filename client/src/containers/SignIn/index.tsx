@@ -38,7 +38,7 @@ class SignIn extends React.Component<SIProps, SIState> {
   render() {
     const auth = this.props.currentUser;
     if (auth?.currentUser?.isLoggedIn) {
-      return <Redirect to="/" />;
+      return <Redirect to="/home" />;
     }
     return (
       <Container>

@@ -16,10 +16,10 @@ class App extends React.Component<{}, {}> {
       <Provider store={store}>
         <PersistGate persistor={persistor} loading={null}>
           <Router>
-            <Route path="/" exact component={Home} />
-            <Route path="/sign-in" exact component={SignIn} />
+            <Route path="/home" exact component={Home} />
+            <Route path="/" exact component={SignIn} />
             <Route path="/sign-up" exact component={SignUp} />
-            <Route path="/game-board" exact component={GameBoard} />
+            <Route path={"/game-board/:boardId?"} exact component={GameBoard} />
           </Router>
         </PersistGate>
       </Provider>

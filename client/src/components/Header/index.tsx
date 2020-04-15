@@ -17,7 +17,7 @@ const Header: React.FC<HProps> = (props: HProps) => {
   return (
     <Navbar collapseOnSelect expand="lg" className="navbar">
       <Container>
-        <Navbar.Brand className="navbar__logo" as={NavLink} to="/">
+        <Navbar.Brand className="navbar__logo" as={NavLink} to="/home">
           Checker Game
         </Navbar.Brand>
         <Navbar.Toggle area-controls="responsive-navbar-nav" />
