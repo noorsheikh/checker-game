@@ -44,6 +44,13 @@ After spinning the containers use this url [http://localhost:3000/](http://local
 ### Windows Local Browser URL
 After contains are up, use the command below to get the IP address to use with the exposed port (192.168.99.100:3000).
 ```docker-machine ip```
+
+### AWS Deployment
+1. Install AWS CLI https://awscli.amazonaws.com/AWSCLIV2.msi
+2. Do yarn deploy in client folder.
+3. Setup aws config.
+4. Run aws s3 sync build/ s3://<S3 name> --acl public-read
+
 ### Windows Virtual Box Settings to make localhost option work ###
 Open Virtual Box default vm settings. Select Network tab, Port Forwarding and then add the following entries
 | Name        | Protocol           | Host IP  | Host Port | Guest IP | Guest Port
