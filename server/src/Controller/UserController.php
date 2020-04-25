@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends BaseController
 {
   /**
-   * @Route("/register", name="register_user")
+   * @Route("/register", name="register_user", condition="context.getMethod() in ['POST']" )
    */
   public function register(Request $request): JsonResponse
   {
