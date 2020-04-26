@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as jwt from 'jsonwebtoken';
 import { Dispatch } from 'redux';
 import { CurrentUser } from '../../models/CurrentUser';
+import { authUrl } from '../../utils';
 
 export enum LoginActions {
   LOGIN_PENDING = 'LOGIN_PENDING',
@@ -13,7 +14,8 @@ export const login = (username: string, password: string) => async (dispatch: Di
   dispatch({ type: LoginActions.LOGIN_PENDING });
 
   try {
-    const token = await axios.post(`http://localhost:80/api/login`, { username, password });
+    const url = 'http://' + authUrl + ':80/api/login';
+    const token = await axios.post(url, { username, password });
     const decodedToken: any = jwt.decode(token.data);
     const currentUser: CurrentUser = {
       token: token.data,
