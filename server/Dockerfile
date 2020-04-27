@@ -15,6 +15,9 @@ RUN a2enmod rewrite
 # enable SSL module
 RUN a2enmod ssl
 
+# enable http headers module
+RUN a2enmod headers
+
 # disable default site
 RUN a2dissite 000-default.conf
 

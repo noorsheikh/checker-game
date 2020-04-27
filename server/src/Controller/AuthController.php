@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AuthController extends BaseController
 {
   /**
-   * @Route("/login", name="login")
+   * @Route("/login", name="login", condition="context.getMethod() in ['POST']" )
    */
   public function login(Request $request): JsonResponse
   {
