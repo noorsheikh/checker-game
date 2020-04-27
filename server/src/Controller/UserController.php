@@ -6,6 +6,7 @@ use Checker\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Noxlogic\RateLimitBundle\Annotation\RateLimit;
 
 /**
  * @Route("/api/user")
@@ -14,6 +15,7 @@ class UserController extends BaseController
 {
   /**
    * @Route("/register", name="register_user", condition="context.getMethod() in ['POST']" )
+   * @RateLimit(limit=5000, period=3600)
    */
   public function register(Request $request): JsonResponse
   {

@@ -120,6 +120,9 @@
     "nikic/php-parser": {
         "version": "v4.3.0"
     },
+    "noxlogic/ratelimit-bundle": {
+        "version": "1.15.1"
+    },
     "ocramius/package-versions": {
         "version": "1.5.1"
     },
@@ -175,6 +178,18 @@
         },
         "files": [
             "config/packages/security_checker.yaml"
+        ]
+    },
+    "snc/redis-bundle": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.0",
+            "ref": "85bbdb3d2db531e20874de29bab0587f93604fa8"
+        },
+        "files": [
+            "./config/packages/snc_redis.yaml"
         ]
     },
     "symfony/asset": {

@@ -8,6 +8,8 @@
         "lexik/jwt-authentication-bundle": "^2.6",
         "nelmio/cors-bundle": "^2.0",
         "sensio/framework-extra-bundle": "^5.5",
+	"noxlogic/ratelimit-bundle": "1.x",
+	"snc/redis-bundle": "3.*",
         "symfony/console": "5.0.*",
         "symfony/dotenv": "5.0.*",
         "symfony/expression-language": "5.0.*",
