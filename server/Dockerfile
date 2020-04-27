@@ -37,4 +37,7 @@ RUN mv composer.phar /usr/local/bin/composer
 
 RUN composer install
 
+# give full permissions to /var/www/hml/var
+RUN chmod -R 777 ./var
+
 EXPOSE 80 443
