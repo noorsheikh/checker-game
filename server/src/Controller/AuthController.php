@@ -40,7 +40,8 @@ class AuthController extends BaseController
     }
 
     $token = $this->jwtEncoder->encode([
-      'username' => $username,
+      'id' => $user->getId(),
+      'username' => $user->getUsername(),
       'firstName' => $user->getFirstName(),
       'lastName' => $user->getLastName()
     ]);

@@ -1,6 +1,6 @@
 // GAMEBOARD HTML FROM: https://github.com/codethejason/checkers/blob/master/index.html
 import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Alert } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
@@ -9,8 +9,19 @@ import Piece from '../../components/Piece';
 import GameStats from '../../components/GameStats';
 import { dictionary, dist } from '../../utils';
 import Pieces from '../../components/Pieces';
+import { GameState } from '../../reducers/game';
+import { Redirect } from 'react-router-dom';
+import { updateGame } from '../../actions/game';
 
 // const DEBUG = true;
+
+interface BProps {
+  game?: GameState;
+  currentUser: CurrentUserState;
+  match: any;
+  history: any;
+  updateGame: Function;
+}
 
 interface BState {
   boardState: number[][];
@@ -19,13 +30,14 @@ interface BState {
   playerTurn: number;
   selectedPiece: object;
   interval: any;
-  currentUser: CurrentUserState;
   alert: string;
+  currentUser: CurrentUserState;
+  game?: GameState;
   winner: string;
   locked: boolean;
 }
 
-class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BState> {
+class GameBoard extends React.Component<BProps, BState> {
   state = {
     boardState: [
       [0, 1, 0, 1, 0, 1, 0, 1],
@@ -63,7 +75,7 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     ],
     interval: undefined,
     currentUser: {} as CurrentUserState,
-    alert: "",
+    alert: '',
     winner: "",
     locked: false
   };
@@ -90,20 +102,22 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     // set playerTurn
   };
 
-  componentDidMount() {
-    this.setState({ interval: setInterval(() => this.tick(), 1000) });
-  }
+  // Not needed now, it creats a long loop while mounting component
+  // componentDidMount() {
+  //   this.setState({ interval: setInterval(() => this.tick(), 1000) });
+  // }
 
-  componentWillUnmount() {
-    this.setState({ interval: clearInterval(this.state.interval) });
-  }
+  // same here
+  // componentWillUnmount() {
+  //   this.setState({ interval: clearInterval(this.state.interval) });
+  // }
 
   isValidPlaceToMove = (tilePosition: any) => {
     const row = tilePosition?.row;
     const column = tilePosition?.column;
     if (row < 0 || row > 7 || column < 0 || column > 7) return false;
 
-    return (this.state.boardState[row][column] === 0) ? true : false;
+    return this.state.boardState[row][column] === 0 ? true : false;
   };
 
   makeKing = (position: any) => {
@@ -229,9 +243,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
       }
 
       //middle tile where the piece to be conquered sits
-      const tileToCheckx = piece?.position?.column + (dx / 2);
-      const tileToChecky = piece?.position?.row + (dy / 2);
-
+      const tileToCheckx = piece?.position?.column + dx / 2;
+      const tileToChecky = piece?.position?.row + dy / 2;
       if (tileToCheckx > 7 || tileToChecky > 7 || tileToCheckx < 0 || tileToChecky < 0) {
         return false;
       }
@@ -426,10 +439,21 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
     }
   };
 
+  updateGame = () => {
+    const { token } = this.props?.currentUser?.currentUser;
+    const game = this.props?.game?.game;
+    this.props.updateGame(token, game?.id, { ...game })
+  }
+
   render() {
     const tiles = [];
     const pieces = [];
     const currentUser = this.props?.currentUser?.currentUser;
+    const game = this.props?.game?.game;
+
+    if (!currentUser?.isLoggedIn) {
+      return <Redirect to="/" />;
+    }
 
     for (let row = 0; row < 8; row++) {
       const oddRow = row % 2 !== 0 ? true : false;
@@ -503,25 +527,35 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
         <Container fluid>
           <Header {...currentUser} />
           <Container>
-            <Row>
-              <Col lg={4}>
-                <GameStats
-                  playerTurn={this.state.playerTurn}
-                  player1={this.state.player1}
-                  player2={this.state.player2}
-                  player1score={this.state.player1score}
-                  player2score={this.state.player2score}
-                  winner={this.state.winner}
-                  alert={this.state.alert}
-                />
-              </Col>
-              <Col lg={8}>
-                <div className="board" >
-                  {[tiles]}
-                  <Pieces pieces={pieces} />
-                </div>
-              </Col>
-            </Row>
+            {!game?.id ||
+            !(currentUser?.id === game?.player1?.id ||
+            currentUser?.id === game?.player2?.id) ? (
+              <Row>
+                <Col style={{ marginTop: 20 }}>
+                  <Alert variant="warning">Game board is not available with game id {game?.id}</Alert>
+                </Col>
+              </Row>
+            ) : (
+              <Row>
+                <Col lg={4}>
+                  <GameStats
+                    playerTurn={this.state.playerTurn}
+                    player1={this.state.player1}
+                    player2={this.state.player2}
+                    player1score={this.state.player1score}
+                    player2score={this.state.player2score}
+                    winner={this.state.winner}
+                    alert={this.state.alert}
+                  />
+                </Col>
+                <Col lg={8}>
+                  <div className="board">
+                    {[tiles]}
+                    <Pieces pieces={pieces} />
+                  </div>
+                </Col>
+              </Row>
+            )}
           </Container>
         </Container>
       </React.Fragment>
@@ -530,7 +564,8 @@ class GameBoard extends React.Component<{ currentUser: CurrentUserState }, BStat
 }
 
 const mapStateToProps = (state: BState) => ({
+  game: state.game,
   currentUser: state.currentUser,
 });
 
-export default connect(mapStateToProps, {})(GameBoard);
+export default connect(mapStateToProps, { updateGame })(GameBoard);

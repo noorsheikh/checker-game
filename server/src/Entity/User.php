@@ -72,13 +72,13 @@ class User implements UserInterface
   private $password;
 
   /**
-   * @ORM\OneToMany(targetEntity="Checker\Entity\GameMoves", mappedBy="user")
+   * @ORM\OneToMany(targetEntity="Checker\Entity\Game", mappedBy="player1")
    */
-  private $gameMoves;
+  private $game;
 
   public function __construct()
   {
-      $this->gameMoves = new ArrayCollection();
+      $this->game = new ArrayCollection();
   }
 
   /**
@@ -192,7 +192,7 @@ class User implements UserInterface
    *
    * @return string
    */
-  public function getPlainPassword(): string
+  public function getPlainPassword(): ?string
   {
     return $this->plainPassword;
   }
@@ -236,32 +236,32 @@ class User implements UserInterface
   }
 
   /**
-   * @return Collection|GameMoves[]
+   * @return Collection|Game[]
    */
-  public function getGameMoves(): Collection
+  public function getGame(): Collection
   {
-      return $this->gameMoves;
+    return $this->gameMoves;
   }
 
-  public function addGameMove(GameMoves $gameMove): self
+  public function addGame(Game $game): self
   {
-      if (!$this->gameMoves->contains($gameMove)) {
-          $this->gameMoves[] = $gameMove;
-          $gameMove->setUser($this);
-      }
+    if (!$this->game->contains($game)) {
+        $this->game[] = $game;
+        $game->setPlayer1($this);
+    }
 
-      return $this;
+    return $this;
   }
 
-  public function removeGameMove(GameMoves $gameMove): self
+  public function removeGame(Game $game): self
   {
-      if ($this->gameMoves->contains($gameMove)) {
-          $this->gameMoves->removeElement($gameMove);
-          // set the owning side to null (unless already changed)
-          if ($gameMove->getUser() === $this) {
-              $gameMove->setUser(null);
-          }
+    if ($this->game->contains($game)) {
+      $this->game->removeElement($game);
+      // set the owning side to null (unless already changed)
+      if ($game->getPlayer1() === $this) {
+          $game->setPlayer1(null);
       }
+    }
 
       return $this;
   }

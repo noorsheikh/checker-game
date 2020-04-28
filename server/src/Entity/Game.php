@@ -2,9 +2,8 @@
 
 namespace Checker\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="Checker\Repository\GameRepository")
@@ -19,24 +18,62 @@ class Game
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="Checker\Entity\GameMoves", mappedBy="game")
-     */
-    private $gameMoves;
-
-    /**
-     * @ORM\OneToOne(targetEntity="Checker\Entity\GameUsers", mappedBy="game", cascade={"persist", "remove"})
-     */
-    private $gameUsers;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\GameStatus")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User", inversedBy="gameMoves")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $status;
+    private $player1;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User", inversedBy="gameMoves")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $player2;
+
+    /**
+     * @ORM\Column(name="board_state", type="string")
+     * @Assert\NotBlank(
+     *  message = "Game board state cannot be blank"
+     * )
+     */
+    private $boardState;
+
+    /**
+     * @ORM\Column(name="created_at", type="datetime", options={"default" : "CURRENT_TIMESTAMP"})
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(name="player1_score", type="integer")
+     */
+    private $player1Score;
+
+    /**
+     * @ORM\Column(name="player2_score", type="integer")
+     */
+    private $player2Score;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $winner;
+
+    /**
+     * @ORM\Column(name="game_status", type="string", length=15, nullable=false)
+     */
+    private $gameStatus;
 
     public function __construct()
     {
-        $this->gameMoves = new ArrayCollection();
+        if (!$this->getCreatedAt()) {
+            $now = new \DateTimeImmutable();
+            $this->setCreatedAt($now);
+        }
     }
 
     public function getId(): ?int
@@ -44,62 +81,110 @@ class Game
         return $this->id;
     }
 
-    /**
-     * @return Collection|GameMoves[]
-     */
-    public function getGameMoves(): Collection
+    public function getPlayer1(): User
     {
-        return $this->gameMoves;
+        return $this->player1;
     }
 
-    public function addGameMove(GameMoves $gameMove): self
+    public function setPlayer1(?User $player1): self
     {
-        if (!$this->gameMoves->contains($gameMove)) {
-            $this->gameMoves[] = $gameMove;
-            $gameMove->setGame($this);
-        }
+        $this->player1 = $player1;
 
         return $this;
     }
 
-    public function removeGameMove(GameMoves $gameMove): self
+    public function getPlayer2(): ?User
     {
-        if ($this->gameMoves->contains($gameMove)) {
-            $this->gameMoves->removeElement($gameMove);
-            // set the owning side to null (unless already changed)
-            if ($gameMove->getGame() === $this) {
-                $gameMove->setGame(null);
-            }
-        }
+        return $this->player2;
+    }
+
+    public function setPlayer2(?User $player2): ?self
+    {
+        $this->player2 = $player2;
 
         return $this;
     }
 
-    public function getGameUsers(): ?GameUsers
+    public function getBoardState(): ?string
     {
-        return $this->gameUsers;
+        return $this->boardState;
     }
 
-    public function setGameUsers(GameUsers $gameUsers): self
+    public function setBoardState(string $boardState): self
     {
-        $this->gameUsers = $gameUsers;
-
-        // set the owning side of the relation if necessary
-        if ($gameUsers->getGame() !== $this) {
-            $gameUsers->setGame($this);
-        }
+        $this->boardState = $boardState;
 
         return $this;
     }
 
-    public function getStatus(): ?GameStatus
+    public function getCreatedAt(): ?string
     {
-        return $this->status;
+        return $this->createdAt ? $this->createdAt->format('Y-m-d H:i:s') : '';
     }
 
-    public function setStatus(?GameStatus $status): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        $this->status = $status;
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?string
+    {
+        return $this->updatedAt ? $this->updatedAt->format('Y-m-d H:i:s') : '';
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): ?self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getPlayer1Score(): ?int
+    {
+        return $this->player1Score;
+    }
+
+    public function setPlayer1Score(int $player1Score): self
+    {
+        $this->player1Score = $player1Score;
+
+        return $this;
+    }
+
+    public function getPlayer2Score(): ?int
+    {
+        return $this->player2Score;
+    }
+
+    public function setPlayer2Score(int $player2Score): self
+    {
+        $this->player2Score = $player2Score;
+
+        return $this;
+    }
+
+    public function getWinner(): ?User
+    {
+        return $this->winner;
+    }
+
+    public function setWinner(User $winner): ?self
+    {
+        $this->winner = $winner;
+
+        return $this;
+    }
+
+    public function getGameStatus(): string
+    {
+        return $this->gameStatus;
+    }
+
+    public function setGameStatus(string $gameStatus): ?self
+    {
+        $this->gameStatus = $gameStatus;
 
         return $this;
     }
