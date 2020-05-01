@@ -113,13 +113,27 @@ class GameController extends BaseController
 
     $player2Score = $requestData['player2Score'] ?? '';
     if ($player2Score) {
-      $game->setPlayer2Score(($player1Score));
+      $game->setPlayer2Score(($player2Score));
     }
 
     $game->setUpdatedAt(new \DateTimeImmutable());
 
     $this->getDoctrine()->getManager()->persist($game);
     $this->getDoctrine()->getManager()->flush();
+
+    return $this->json($this->buildResponse($game));
+  }
+
+  /**
+   * @Route("/game-board/{id}", requirements={"id": "\d+"}, name="get_game_board", methods={"GET"})
+   */
+  public function getGameBoard(int $id): JsonResponse
+  {
+    $game = $this
+      ->getDoctrine()
+      ->getRepository(Game::class)
+      ->find($id)
+    ;
 
     return $this->json($this->buildResponse($game));
   }

@@ -11,16 +11,20 @@ import { dictionary, dist } from '../../utils';
 import Pieces from '../../components/Pieces';
 import { GameState } from '../../reducers/game';
 import { Redirect } from 'react-router-dom';
-import { updateGame } from '../../actions/game';
+import { updateGame, getGame } from '../../actions/game';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { Game } from '../../models';
 
 // const DEBUG = true;
 
 interface BProps {
-  game?: GameState;
+  game: GameState;
   currentUser: CurrentUserState;
   match: any;
   history: any;
   updateGame: Function;
+  getGame: Function;
 }
 
 interface BState {
@@ -32,7 +36,7 @@ interface BState {
   interval: any;
   alert: string;
   currentUser: CurrentUserState;
-  game?: GameState;
+  game: GameState;
   winner: string;
   locked: boolean;
 }
@@ -77,7 +81,8 @@ class GameBoard extends React.Component<BProps, BState> {
     currentUser: {} as CurrentUserState,
     alert: '',
     winner: "",
-    locked: false
+    locked: false,
+    game: {} as GameState,
   };
 
   pieces = [
@@ -91,6 +96,12 @@ class GameBoard extends React.Component<BProps, BState> {
       },
     },
   ];
+
+  componentDidMount() {
+    const gameId = this.props?.game?.game?.id;
+    const token = this.props?.currentUser?.currentUser?.token;
+    this.props.getGame(token, gameId);
+  }
 
   tick = () => {
     // TODO: Pull game board state from server and update state only if state differs from server data
@@ -113,15 +124,16 @@ class GameBoard extends React.Component<BProps, BState> {
   // }
 
   isValidPlaceToMove = (tilePosition: any) => {
+    const boardState = this.props?.game?.game?.boardState || [];
     const row = tilePosition?.row;
     const column = tilePosition?.column;
     if (row < 0 || row > 7 || column < 0 || column > 7) return false;
 
-    return this.state.boardState[row][column] === 0 ? true : false;
+    return boardState[row][column] === 0 ? true : false;
   };
 
   makeKing = (position: any) => {
-    const boardState = this.state.boardState;
+    const boardState = this.props?.game?.game?.boardState || [];
     if (boardState[position?.row][position?.column] === 1) {
       boardState[position?.row][position?.column] = 3;
     } else if (boardState[position?.row][position?.column] === 2) {
@@ -145,7 +157,7 @@ class GameBoard extends React.Component<BProps, BState> {
 
   movePiece = (tilePosition: any) => {
     const selectedPiece: any = this.state.selectedPiece;
-    const boardState = this.state.boardState;
+    const boardState = this.props?.game?.game?.boardState || [];
 
     if (selectedPiece) {
       if (selectedPiece?.player !== this.state.playerTurn) return;
@@ -175,8 +187,8 @@ class GameBoard extends React.Component<BProps, BState> {
 
   removePiece = (position: any) => {
     // if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
-    const boardState = this.state.boardState;
-    const boardValue = this.state.boardState[position?.row][position?.column];
+    const boardState = this.props.game?.game?.boardState || [];
+    const boardValue = boardState[position?.row][position?.column];
     let player1score = this.state.player1score;
     let player2score = this.state.player2score;
     if (boardValue === 1 || boardValue === 3) player2score++;
@@ -284,28 +296,41 @@ class GameBoard extends React.Component<BProps, BState> {
   }
 
   checkIfWinner(player1score: number, player2score: number) {
+    const token = this.props?.currentUser?.currentUser?.token;
+    const gameId = this.props?.game?.game?.id;
+    const player1Id = this.props?.game?.game?.player1?.id;
+    const player2Id = this.props?.game?.game?.player2?.id;
     let winner = false;
     if (player1score === 12) {
       this.setState({ winner: 'Player 1' });
+      this.props.updateGame(token, gameId, { winnerId: player1Id });
       winner = true;
     } else if (player2score === 12) {
       this.setState({ winner: 'Player 2' });
+      this.props.updateGame(token, gameId, { winnerId: player2Id });
       winner = true;
     }
 
     if (winner) {
       this.setState({ locked: true });
-      // TODO: Declare winner on server
     }
   }
 
-  updateGameBoardAndPlayerScores = (boardState: number[][], player1score: number, player2score: number) => {
-    this.setState({ boardState });
-    this.setState({ player1score, player2score });
+  updateGameBoardAndPlayerScores = (boardState: number[][], player1Score: number, player2Score: number) => {
+    // this.setState({ boardState });
+    this.setState({ player1score: player1Score, player2score: player2Score });
 
-    this.checkIfWinner(player1score, player2score);
+    this.checkIfWinner(player1Score, player2Score);
 
     // TODO: Send state and scores to server
+    const { token } = this.props?.currentUser?.currentUser;
+    const { id } = this.props?.game?.game;
+    const updateGamePayload: Game = {
+      boardState,
+      player1Score,
+      player2Score
+    };
+    this.props.updateGame(token, id, updateGamePayload);
   }
 
   updateAlertState = (alert: string) => {
@@ -450,113 +475,131 @@ class GameBoard extends React.Component<BProps, BState> {
     const pieces = [];
     const currentUser = this.props?.currentUser?.currentUser;
     const game = this.props?.game?.game;
+    // console.log(game?.boardState);
+    // console.log(this.state.boardState);
+    // console.log(game);
+    // console.log('player 1 score ' + this.state.player1score);
+    // console.log('player 2 score ' + this.state.player2score);
 
     if (!currentUser?.isLoggedIn) {
       return <Redirect to="/" />;
     }
 
-    for (let row = 0; row < 8; row++) {
-      const oddRow = row % 2 !== 0 ? true : false;
-      for (let column = 0; column < 8; column++) {
-        const oddColumn = column % 2 !== 0 ? true : false;
-        const position = { row: row, column: column };
-        const tileID = 'tile' + (row * 8 + (column + 1));
+    if (game?.boardState) {
+      for (let row = 0; row < 8; row++) {
+        const oddRow = row % 2 !== 0 ? true : false;
+        for (let column = 0; column < 8; column++) {
+          const oddColumn = column % 2 !== 0 ? true : false;
+          const position = { row: row, column: column };
+          const tileID = 'tile' + (row * 8 + (column + 1));
 
-        let validTile = false;
-        if (oddRow) {
-          if (!oddColumn) {
-            validTile = true;
-          }
-        } else {
-          if (oddColumn) {
-            validTile = true;
-          }
-        }
-
-        let selected = false;
-        if (this.state?.selectedPiece !== null) {
-          if (
-            this.state?.selectedPiece?.position?.row === position?.row &&
-            this.state?.selectedPiece?.position?.column === position?.column
-          ) {
-            selected = true;
-          }
-        }
-
-        const style = {
-          top: dictionary[position?.row],
-          left: dictionary[position?.column],
-        };
-
-        if (validTile) {
-          tiles.push(<Tile key={tileID} position={position} handleClick={this.onTileClick} style={style} />);
-
-          if (this.state.boardState[row][column] !== 0) {
-            let player = 1;
-            let king = false;
-            if (this.state.boardState[row][column] === 2) {
-              player = 2;
-            } else if (this.state.boardState[row][column] === 3) {
-              king = true;
-            } else if (this.state.boardState[row][column] === 4) {
-              player = 2;
-              king = true;
+          let validTile = false;
+          if (oddRow) {
+            if (!oddColumn) {
+              validTile = true;
             }
+          } else {
+            if (oddColumn) {
+              validTile = true;
+            }
+          }
 
-            const piece = (
-              <Piece
-                key={pieces.length}
-                player={player}
-                position={position}
-                king={king}
-                selected={selected}
-                playerTurn={this.state.playerTurn}
-                handleClick={this.onPieceClick}
-                dictionary={dictionary}
-              />
-            );
-            pieces.push(piece);
+          let selected = false;
+          if (this.state?.selectedPiece !== null) {
+            if (
+              this.state?.selectedPiece?.position?.row === position?.row &&
+              this.state?.selectedPiece?.position?.column === position?.column
+            ) {
+              selected = true;
+            }
+          }
+
+          const style = {
+            top: dictionary[position?.row],
+            left: dictionary[position?.column],
+          };
+
+          if (validTile) {
+            tiles.push(<Tile key={tileID} position={position} handleClick={this.onTileClick} style={style} />);
+
+            if (game.boardState[row][column] !== 0) {
+              let player = 1;
+              let king = false;
+              if (game.boardState[row][column] === 2) {
+                player = 2;
+              } else if (game.boardState[row][column] === 3) {
+                king = true;
+              } else if (game.boardState[row][column] === 4) {
+                player = 2;
+                king = true;
+              }
+
+              const piece = (
+                <Piece
+                  key={pieces.length}
+                  player={player}
+                  position={position}
+                  king={king}
+                  selected={selected}
+                  playerTurn={this.state.playerTurn}
+                  handleClick={this.onPieceClick}
+                  dictionary={dictionary}
+                />
+              );
+              pieces.push(piece);
+            }
           }
         }
       }
+      this.pieces = pieces;
     }
-    this.pieces = pieces;
 
     return (
       <React.Fragment>
         <Container fluid>
           <Header {...currentUser} />
-          <Container>
-            {!game?.id ||
-            !(currentUser?.id === game?.player1?.id ||
-            currentUser?.id === game?.player2?.id) ? (
-              <Row>
-                <Col style={{ marginTop: 20 }}>
-                  <Alert variant="warning">Game board is not available with game id {game?.id}</Alert>
-                </Col>
-              </Row>
-            ) : (
-              <Row>
-                <Col lg={4}>
-                  <GameStats
-                    playerTurn={this.state.playerTurn}
-                    player1={this.state.player1}
-                    player2={this.state.player2}
-                    player1score={this.state.player1score}
-                    player2score={this.state.player2score}
-                    winner={this.state.winner}
-                    alert={this.state.alert}
-                  />
-                </Col>
-                <Col lg={8}>
-                  <div className="board">
-                    {[tiles]}
-                    <Pieces pieces={pieces} />
-                  </div>
-                </Col>
-              </Row>
-            )}
-          </Container>
+          {game?.id
+            ?
+              <Container>
+                {!game?.id ||
+                !(currentUser?.id === game?.player1?.id ||
+                currentUser?.id === game?.player2?.id) ? (
+                  <Row>
+                    <Col style={{ marginTop: 20 }}>
+                      <Alert variant="warning">Game board is not available with game id {game?.id}</Alert>
+                    </Col>
+                  </Row>
+                ) : (
+                  <Row>
+                    <Col lg={4}>
+                      <GameStats
+                        playerTurn={this.state.playerTurn}
+                        player1={game?.player1?.id ? `${game?.player1?.firstName} ${game?.player1?.lastName}` : 'Player 1'}
+                        player2={game?.player2?.id ? `${game?.player2?.firstName} ${game?.player2?.lastName}` : 'Player 2'}
+                        player1score={game.player1Score || 0}
+                        player2score={game.player2Score || 0}
+                        winner={this.state.winner}
+                        alert={this.state.alert}
+                      />
+                    </Col>
+                    <Col lg={8}>
+                      <div className="board">
+                        {[tiles]}
+                        <Pieces pieces={pieces} />
+                      </div>
+                    </Col>
+                  </Row>
+                )}
+              </Container>
+            :
+              <Container>
+                <Row>
+                  <Col>
+                    <FontAwesomeIcon icon={faSpinner} />
+                  </Col>
+                </Row>
+              </Container>
+          }
         </Container>
       </React.Fragment>
     );
@@ -568,4 +611,4 @@ const mapStateToProps = (state: BState) => ({
   currentUser: state.currentUser,
 });
 
-export default connect(mapStateToProps, { updateGame })(GameBoard);
+export default connect(mapStateToProps, { updateGame, getGame })(GameBoard);

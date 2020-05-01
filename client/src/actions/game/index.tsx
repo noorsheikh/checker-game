@@ -57,3 +57,27 @@ export const updateGame = (token: string, gameId: number, gamePayload: Game) => 
     });
   }
 };
+
+export const getGame = (token: string, gameId: number) => async (dispatch: Dispatch) => {
+  dispatch({ type: GameActionTypes.GAME_PENDING });
+  try {
+    const game = await axios.get(
+      `http://localhost:80/api/secure/game-board/${gameId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    dispatch({
+      type: GameActionTypes.GAME_SUCCESS,
+      payload: game?.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GameActionTypes.GAME_ERROR,
+      error: error?.response?.data?.message,
+    });
+  }
+};
