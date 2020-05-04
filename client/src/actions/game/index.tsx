@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Dispatch } from 'redux';
 import { Game } from '../../models';
+import { authHttpFlag, host, authHttpPort, authHttpsPort } from '../../utils';
 
 export enum GameActionTypes {
   GAME_PENDING = 'GAME_PENDING',
@@ -11,8 +12,11 @@ export enum GameActionTypes {
 export const createGame = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
+    const http = authHttpFlag === '1' ? 'http' : 'https';
+    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
+    const url = http + '://' + host + ':' + port + '/api/secure/game-board/create';
     const game = await axios.post(
-      `http://localhost:80/api/secure/game-board/create`,
+      url,
       {},
       {
         headers: {
