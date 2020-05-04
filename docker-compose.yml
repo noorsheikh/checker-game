@@ -17,9 +17,9 @@ services:
       - server
     environment:
       - CHOKIDAR_USEPOLLING=true
-      # - HTTPS=true
-      # - SSL_KEY_FILE=client.key
-      # - SSL_CRT_FILE=client.crt
+      - HTTPS=true
+      - SSL_KEY_FILE=client.key
+      - SSL_CRT_FILE=client.crt
     networks:
       checker_game:
     tty: true
