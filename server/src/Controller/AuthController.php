@@ -32,11 +32,11 @@ class AuthController extends BaseController
     ;
 
     if (! $user instanceof User) {
-      return $this->json([ 'message' => sprintf('User not found with username %s', $username) ], 404);
+      return $this->json([ 'message' => sprintf('Username %s or password is incorrect.', $username) ], 404);
     }
 
     if (! $this->passwordEncoder->isPasswordValid($user, $password)) {
-      return $this->json([ 'message' => 'User password is not matching, please try again.' ], 401);
+      return $this->json([ 'message' => 'Username or password is not matching, please try again.' ], 401);
     }
 
     $token = $this->jwtEncoder->encode([
