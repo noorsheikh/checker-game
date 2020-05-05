@@ -163,19 +163,19 @@ class GameController extends BaseController
 
     if ($game->getPlayer2() instanceof User) {
       $response['player2'] = [
-        'id' => $game->getPlayer1()->getId(),
-        'firstName' => $game->getPlayer1()->getFirstName(),
-        'lastName' => $game->getPlayer1()->getLastName(),
-        'username' => $game->getPlayer1()->getUsername(),
+        'id' => $game->getPlayer2()->getId(),
+        'firstName' => $game->getPlayer2()->getFirstName(),
+        'lastName' => $game->getPlayer2()->getLastName(),
+        'username' => $game->getPlayer2()->getUsername(),
       ];
     }
 
     if ($game->getWinner() instanceof User) {
       $response['winner'] = [
-        'id' => $game->getPlayer1()->getId(),
-        'firstName' => $game->getPlayer1()->getFirstName(),
-        'lastName' => $game->getPlayer1()->getLastName(),
-        'username' => $game->getPlayer1()->getUsername(),
+        'id' => $game->getWinner()->getId(),
+        'firstName' => $game->getWinner()->getFirstName(),
+        'lastName' => $game->getWinner()->getLastName(),
+        'username' => $game->getWinner()->getUsername(),
       ];
     }
 

@@ -1,10 +1,9 @@
-import { User } from '../../models/User';
 import { RegisterUserActionTypes } from '../../actions/user';
 import { AnyAction } from 'redux';
 
 export interface RegisterUserState {
   type: string;
-  user: User;
+  user: string;
   error: string[];
 }
 

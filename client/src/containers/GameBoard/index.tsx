@@ -97,10 +97,16 @@ class GameBoard extends React.Component<BProps, BState> {
     },
   ];
 
+  interval: any;
+
   componentDidMount() {
     const gameId = this.props?.game?.game?.id;
     const token = this.props?.currentUser?.currentUser?.token;
-    this.props.getGame(token, gameId);
+    this.interval = setInterval(() => this.props.getGame(token, gameId), 3000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   tick = () => {
@@ -475,6 +481,7 @@ class GameBoard extends React.Component<BProps, BState> {
     const pieces = [];
     const currentUser = this.props?.currentUser?.currentUser;
     const game = this.props?.game?.game;
+    // console.log(game);
     // console.log(game?.boardState);
     // console.log(this.state.boardState);
     // console.log(game);
