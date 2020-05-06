@@ -97,37 +97,11 @@ class GameBoard extends React.Component<BProps, BState> {
     },
   ];
 
-  interval: any;
-
   componentDidMount() {
     const gameId = this.props?.game?.game?.id;
     const token = this.props?.currentUser?.currentUser?.token;
-    this.interval = setInterval(() => this.props.getGame(token, gameId), 3000);
+    this.props.getGame(token, gameId);
   }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  tick = () => {
-    // TODO: Pull game board state from server and update state only if state differs from server data
-    // set boardState
-    // set player1
-    // set player2
-    // set player1score
-    // set player2score
-    // set playerTurn
-  };
-
-  // Not needed now, it creats a long loop while mounting component
-  // componentDidMount() {
-  //   this.setState({ interval: setInterval(() => this.tick(), 1000) });
-  // }
-
-  // same here
-  // componentWillUnmount() {
-  //   this.setState({ interval: clearInterval(this.state.interval) });
-  // }
 
   isValidPlaceToMove = (tilePosition: any) => {
     const boardState = this.props?.game?.game?.boardState || [];
@@ -178,7 +152,9 @@ class GameBoard extends React.Component<BProps, BState> {
       boardState[selectedPiece?.position?.row][selectedPiece?.position?.column] = 0;
 
       boardState[tilePosition?.row][tilePosition?.column] = this.getBoardValue(selectedPiece);
-      this.setState({ boardState });
+      const token = this.props?.currentUser?.currentUser?.token;
+      const gameId = this.props?.game?.game?.id;
+      this.props.updateGame(token, gameId, { boardState })
       //if piece reaches the end of the row on opposite side crown it a king (can move all directions)
       if (!selectedPiece.king) {
         if (selectedPiece.player === 1) {
@@ -308,11 +284,11 @@ class GameBoard extends React.Component<BProps, BState> {
     const player2Id = this.props?.game?.game?.player2?.id;
     let winner = false;
     if (player1score === 12) {
-      this.setState({ winner: 'Player 1' });
+      this.props.updateGame(token, gameId, { winnerId: player1Id });
       this.props.updateGame(token, gameId, { winnerId: player1Id });
       winner = true;
     } else if (player2score === 12) {
-      this.setState({ winner: 'Player 2' });
+      this.props.updateGame(token, gameId, { winnerId: player1Id });
       this.props.updateGame(token, gameId, { winnerId: player2Id });
       winner = true;
     }
@@ -323,12 +299,10 @@ class GameBoard extends React.Component<BProps, BState> {
   }
 
   updateGameBoardAndPlayerScores = (boardState: number[][], player1Score: number, player2Score: number) => {
-    // this.setState({ boardState });
     this.setState({ player1score: player1Score, player2score: player2Score });
 
     this.checkIfWinner(player1Score, player2Score);
 
-    // TODO: Send state and scores to server
     const { token } = this.props?.currentUser?.currentUser;
     const { id } = this.props?.game?.game;
     const updateGamePayload: Game = {
@@ -470,23 +444,12 @@ class GameBoard extends React.Component<BProps, BState> {
     }
   };
 
-  updateGame = () => {
-    const { token } = this.props?.currentUser?.currentUser;
-    const game = this.props?.game?.game;
-    this.props.updateGame(token, game?.id, { ...game })
-  }
-
   render() {
     const tiles = [];
     const pieces = [];
     const currentUser = this.props?.currentUser?.currentUser;
     const game = this.props?.game?.game;
     // console.log(game);
-    // console.log(game?.boardState);
-    // console.log(this.state.boardState);
-    // console.log(game);
-    // console.log('player 1 score ' + this.state.player1score);
-    // console.log('player 2 score ' + this.state.player2score);
 
     if (!currentUser?.isLoggedIn) {
       return <Redirect to="/" />;
@@ -585,7 +548,7 @@ class GameBoard extends React.Component<BProps, BState> {
                         player2={game?.player2?.id ? `${game?.player2?.firstName} ${game?.player2?.lastName}` : 'Player 2'}
                         player1score={game.player1Score || 0}
                         player2score={game.player2Score || 0}
-                        winner={this.state.winner}
+                        winner={game?.winner ? `${game?.winner?.firstName} ${game?.winner?.lastName}` : ''}
                         alert={this.state.alert}
                       />
                     </Col>
