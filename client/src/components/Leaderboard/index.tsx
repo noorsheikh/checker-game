@@ -29,6 +29,7 @@ class Leaderboard extends React.Component<LProps, LState> {
     return (
       <React.Fragment>
         <Container fluid>
+          {leaderboard &&
           <MaterialTable
             columns={[
               { title: "Username", field: "username" },
@@ -43,7 +44,7 @@ class Leaderboard extends React.Component<LProps, LState> {
               pageSize: 10,
               search: false
             }}
-          />
+          />}
         </Container>
       </React.Fragment>
     );
