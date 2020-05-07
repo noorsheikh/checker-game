@@ -8,4 +8,5 @@ server/httpd-conf/server.key
 client/node_modules/
 client/client.crt
 client/client.key
+client/.env
 .idea
