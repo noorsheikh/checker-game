@@ -83,6 +83,15 @@ class SignUp extends React.Component<SIProps, SIState> {
             </Col>
           </Row>
         )}
+        {register?.user && (
+          <Row>
+            <Col lg={{ span: 6, offset: 3 }}>
+              <Alert variant="success">
+                <Alert.Heading>Registration is Successful</Alert.Heading>
+              </Alert>
+            </Col>
+          </Row>
+        )}
         <Row>
           <Col lg={{ span: 6, offset: 3 }} className="justify-content-md-center">
             <div className="cg-section">
