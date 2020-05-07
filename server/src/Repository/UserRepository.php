@@ -27,7 +27,10 @@ class UserRepository extends ServiceEntityRepository
         (SELECT wins) / (SELECT numGames) AS winRatio
       FROM user AS u
       LEFT JOIN game g ON g.winner_id = u.id
-      WHERE g.winner_id IS NOT NULL';
+      WHERE g.winner_id IS NOT NULL
+      ORDER BY wins DESC,
+        winRatio DESC,
+        losses ASC';
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
