@@ -29,22 +29,24 @@ class Leaderboard extends React.Component<LProps, LState> {
     return (
       <React.Fragment>
         <Container fluid>
-          {leaderboard &&
-          <MaterialTable
-            columns={[
-              { title: "Username", field: "username" },
-              { title: "Wins", field: "wins", type: "numeric" },
-              { title: "Losses", field: "losses", type: "numeric" },
-              { title: "# Games", field: "numGames", type: "numeric" },
-              { title: "Win Ratio", field: "winRatio", type: "numeric" },
-            ]}
-            data={leaderboard}
-            title="Leaderboard"
-            options={{
-              pageSize: 10,
-              search: false
-            }}
-          />}
+          {
+            leaderboard &&
+            <MaterialTable
+              columns={[
+                { title: "Username", field: "username" },
+                { title: "Wins", field: "wins", type: "numeric" },
+                { title: "Losses", field: "losses", type: "numeric" },
+                { title: "# Games", field: "numGames", type: "numeric" },
+                { title: "Win Ratio", field: "winRatio", type: "numeric" },
+              ]}
+              data={leaderboard}
+              title="Leaderboard"
+              options={{
+                pageSize: 10,
+                search: false
+              }}
+            />
+          }
         </Container>
       </React.Fragment>
     );

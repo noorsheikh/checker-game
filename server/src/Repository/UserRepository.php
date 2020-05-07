@@ -26,7 +26,7 @@ class UserRepository extends ServiceEntityRepository
         (SELECT numGames) - (SELECT wins) AS losses,
         (SELECT wins) / (SELECT numGames) AS winRatio
       FROM user AS u
-      LEFT JOIN game g ON g.winner_id = u.id
+      LEFT JOIN game g ON (g.player1_id = u.id OR g.player2_id = u.id)
       WHERE g.winner_id IS NOT NULL
       ORDER BY wins DESC,
         winRatio DESC,
