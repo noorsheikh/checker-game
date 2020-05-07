@@ -11,6 +11,7 @@ services:
       - ./client/yarn.lock:/client/yarn.lock
       - ./client/tsconfig.json:/client/tsconfig.json
       - ./client/.eslintrc.js:/client/.eslintrc.js
+      - ./client/.env:/client/.env
     ports:
       - 3000:3000
     depends_on:
