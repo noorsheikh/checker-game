@@ -9,6 +9,7 @@ import GameBoard from './containers/GameBoard';
 import Home from './containers/Home';
 import SignIn from './containers/SignIn';
 import SignUp from './containers/SignUp';
+import JoinGame from './containers/JoinGame';
 
 class App extends React.Component<{}, {}> {
   render() {
@@ -20,6 +21,7 @@ class App extends React.Component<{}, {}> {
             <Route path="/" exact component={SignIn} />
             <Route path="/sign-up" exact component={SignUp} />
             <Route path={"/game-board/:boardId?"} exact component={GameBoard} />
+            <Route path="/join-game" exact component={JoinGame} />
           </Router>
         </PersistGate>
       </Provider>

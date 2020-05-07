@@ -19,22 +19,20 @@ class GameRepository extends ServiceEntityRepository
         parent::__construct($registry, Game::class);
     }
 
-    // /**
-    //  * @return Game[] Returns an array of Game objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getUnstartedGames($userId): array
     {
         return $this->createQueryBuilder('g')
-            ->andWhere('g.exampleField = :val')
-            ->setParameter('val', $value)
+            ->where('g.gameStatus = :gameStatus')
+            ->andWhere('g.winner is null')
+            ->andWhere('g.player1 != :userId')
+            ->setParameter('gameStatus', 'not-started')
+            ->setParameter('userId', $userId)
             ->orderBy('g.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Game

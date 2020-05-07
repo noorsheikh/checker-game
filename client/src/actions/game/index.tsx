@@ -81,3 +81,27 @@ export const getGame = (token: string, gameId: number) => async (dispatch: Dispa
     });
   }
 };
+
+export const getUnstartedGames = (token: string, userId: number) => async (dispatch: Dispatch) => {
+  dispatch({ type: GameActionTypes.GAME_PENDING });
+  try {
+    const game = await axios.get(
+      `http://localhost:80/api/secure/unstarted-games/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    dispatch({
+      type: GameActionTypes.GAME_SUCCESS,
+      payload: game?.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GameActionTypes.GAME_ERROR,
+      error: error?.response?.data?.message,
+    });
+  }
+};

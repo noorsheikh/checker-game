@@ -97,10 +97,18 @@ class GameBoard extends React.Component<BProps, BState> {
     },
   ];
 
+  interval: any;
+
   componentDidMount() {
-    const gameId = this.props?.game?.game?.id;
-    const token = this.props?.currentUser?.currentUser?.token;
-    this.props.getGame(token, gameId);
+    this.interval = setInterval(() => {
+      const gameId = this.props?.game?.game?.id;
+      const token = this.props?.currentUser?.currentUser?.token;
+      this.props.getGame(token, gameId);
+    }, 5000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   isValidPlaceToMove = (tilePosition: any) => {
@@ -219,6 +227,7 @@ class GameBoard extends React.Component<BProps, BState> {
 
   canOpponentJump = (piece: any, newPosition: any) => {
     const pieces = this.pieces;
+    const boardState = this.props?.game?.game?.boardState || [];
     if (piece) {
       //find what the displacement is
       const dx = newPosition?.column - piece?.position?.column;
@@ -251,7 +260,7 @@ class GameBoard extends React.Component<BProps, BState> {
         for (const pieceIndex in pieces) {
           const thisPiece = pieces[pieceIndex].props;
           if (thisPiece?.position?.row === tileToChecky && thisPiece?.position?.column === tileToCheckx) {
-            if (piece.player !== thisPiece.player && this.state.boardState[tileToChecky][tileToCheckx] !== 0) {
+            if (piece.player !== thisPiece.player && boardState[tileToChecky][tileToCheckx] !== 0) {
               //return the piece sitting there
               const ret = thisPiece?.position;
               //if (DEBUG) console.log("canOpponentJump:" + JSON.stringify(ret));
@@ -449,7 +458,6 @@ class GameBoard extends React.Component<BProps, BState> {
     const pieces = [];
     const currentUser = this.props?.currentUser?.currentUser;
     const game = this.props?.game?.game;
-    // console.log(game);
 
     if (!currentUser?.isLoggedIn) {
       return <Redirect to="/" />;

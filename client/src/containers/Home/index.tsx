@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
 import Header from '../../components/Header';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { createGame } from '../../actions/game';
-import { Redirect } from 'react-router-dom';
+import { createGame } from '../../actions';
+import { Redirect, NavLink } from 'react-router-dom';
 import { GameState } from '../../reducers/game';
 
 interface HProps {
@@ -39,8 +39,13 @@ class Home extends React.Component<HProps, HState> {
         <Container>
           <Row>
             <Col style={{ textAlign: 'center', marginTop: 20 }}>
-              <Button variant="primary" onClick={this.startGame}>
+              <Button variant="primary" onClick={this.startGame} size='lg' block>
                 Start Game
+              </Button>
+            </Col>
+            <Col style={{ textAlign: 'center', marginTop: 20 }}>
+              <Button as={NavLink} to='/join-game' variant="success" size='lg' block>
+                Join Game
               </Button>
             </Col>
           </Row>

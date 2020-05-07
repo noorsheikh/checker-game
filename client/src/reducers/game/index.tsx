@@ -8,6 +8,12 @@ export interface GameState {
   error: string[];
 }
 
+export interface UnstartedGamesState {
+  type: string;
+  games: Game[];
+  error: string[];
+}
+
 export const createGameReducer = (state: any = null, action: AnyAction) => {
   switch (action.type) {
     case GameActionTypes.GAME_PENDING:
@@ -79,6 +85,32 @@ export const getGameReducer = (state: any = null, action: AnyAction) => {
         ...state,
         pending: false,
         game: null,
+        error: action.error,
+      };
+    default:
+      return state;
+  }
+};
+
+export const getUnstartedGamesReducer = (state: any = null, action: AnyAction) => {
+  switch (action.type) {
+    case GameActionTypes.GAME_PENDING:
+      return {
+        ...state,
+        pending: true,
+      };
+    case GameActionTypes.GAME_SUCCESS:
+      return {
+        ...state,
+        pending: false,
+        games: action.payload,
+        error: null,
+      };
+    case GameActionTypes.GAME_ERROR:
+      return {
+        ...state,
+        pending: false,
+        games: null,
         error: action.error,
       };
     default:
