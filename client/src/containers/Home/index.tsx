@@ -38,12 +38,12 @@ class Home extends React.Component<HProps, HState> {
       <React.Fragment>
         <Header {...currentUser} />
         <Container>
-          <Row>
-            <Col style={{ textAlign: 'center', marginTop: 20 }}>
+          <Row style={{ marginTop: 20 }}>
+            <Col><Leaderboard /></Col>
+            <Col style={{ textAlign: 'center' }}>
               <Button variant="primary" onClick={this.startGame}>
                 Start Game
               </Button>
-              <Leaderboard />
             </Col>
           </Row>
         </Container>

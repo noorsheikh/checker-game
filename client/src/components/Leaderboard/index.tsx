@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import { connect } from 'react-redux';
+import MaterialTable from "material-table";
 import { getLeaderboard } from '../../actions/user';
 import { LeaderboardState } from '../../reducers/user';
 import { CurrentUserState } from '../../reducers/auth';
@@ -23,12 +24,26 @@ class Leaderboard extends React.Component<LProps, LState> {
   }
 
   render() {
-   const leaderboard = this.props.leaderboard;
-   console.log(JSON.stringify(leaderboard));
+   const leaderboard = this.props?.leaderboard?.leaderboard;
+
     return (
       <React.Fragment>
         <Container fluid>
-          
+          <MaterialTable
+            columns={[
+              { title: "Username", field: "username" },
+              { title: "Wins", field: "wins", type: "numeric" },
+              { title: "Losses", field: "losses", type: "numeric" },
+              { title: "# Games", field: "numGames", type: "numeric" },
+              { title: "Win Ratio", field: "winRatio", type: "numeric" },
+            ]}
+            data={leaderboard}
+            title="Leaderboard"
+            options={{
+              pageSize: 10,
+              search: false
+            }}
+          />
         </Container>
       </React.Fragment>
     );
