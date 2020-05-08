@@ -77,7 +77,7 @@ class Home extends React.Component<HProps, HState> {
               </Row>
               <Row style={{ marginTop: 20 }}>
                 {
-                  this.filterCurrentGames(currentGames) &&
+                  this.filterCurrentGames(currentGames).length > 0 &&
                   <MaterialTable
                     columns={[
                       { title: "Opponent", field: "player1.username" },
@@ -97,7 +97,7 @@ class Home extends React.Component<HProps, HState> {
             </Col>
             <Col>
               {
-                this.filterFinishedGames(currentGames) &&
+                this.filterFinishedGames(currentGames).length > 0 &&
                 <MaterialTable
                   columns={[
                     { title: "Player 1", field: "player1.username" },
