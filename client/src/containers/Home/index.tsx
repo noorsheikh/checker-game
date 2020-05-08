@@ -4,10 +4,11 @@ import { CurrentUserState } from '../../reducers/auth';
 import Header from '../../components/Header';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import MaterialTable from "material-table";
-import { createGame, getCurrentGames, getFinishedGames } from '../../actions/game';
+import { createGame, getCurrentGames } from '../../actions/game';
 import { Redirect } from 'react-router-dom';
-import { GameState, CurrentGamesState, FinishedGamesState } from '../../reducers/game';
+import { GameState, GamesState } from '../../reducers/game';
 import Leaderboard from '../../components/Leaderboard';
+import { Game } from '../../models';
 
 interface HProps {
   currentUser: CurrentUserState;
@@ -15,25 +16,22 @@ interface HProps {
   game?: GameState;
   history: any;
   getCurrentGames: Function;
-  currentGames?: CurrentGamesState;
+  currentGames: GamesState;
   getFinishedGames: Function;
-  finishedGames?: FinishedGamesState;
 }
 
 interface HState {
   currentUser: CurrentUserState;
   game?: GameState;
-  currentGames?: CurrentGamesState;
-  finishedGames?: FinishedGamesState;
+  currentGames: GamesState;
 }
 
 class Home extends React.Component<HProps, HState> {
   componentDidMount() {
     const currentUser = this.props?.currentUser?.currentUser;
     if (currentUser) {
-      const { token } = currentUser;
-      this.props.getCurrentGames(token, this.props?.currentUser?.currentUser.id);
-      this.props.getFinishedGames(token);
+      const { token, id } = currentUser;
+      this.props.getCurrentGames(token, id);
     }
   }
 
@@ -44,17 +42,26 @@ class Home extends React.Component<HProps, HState> {
     return this.props?.history?.push('/game-board');
   };
 
+  filterCurrentGames = (games: Game[]) => {
+    const id = this.props?.currentUser?.currentUser?.id;
+    return games?.filter(game => {
+      return game.gameStatus === 'in-progress' && (game?.player1?.id === id || game?.player2?.id === id);
+    })
+  }
+
+  filterFinishedGames = (games: Game[]) => {
+    return games?.filter(game => {
+      return game.winner !== null;
+    })
+  }
+
   render() {
     const currentUser = this.props?.currentUser?.currentUser;
     if (!currentUser?.isLoggedIn) {
       return <Redirect to="/" />;
     }
 
-    const currentGames = this.props?.currentGames?.currentGames;
-    console.log("current games:" + JSON.stringify(currentGames));
-
-    const finishedGames = this.props?.finishedGames?.finishedGames;
-    console.log("finished games:" + JSON.stringify(finishedGames));
+    const currentGames = this.props?.currentGames?.games;
 
     return (
       <React.Fragment>
@@ -70,7 +77,7 @@ class Home extends React.Component<HProps, HState> {
               </Row>
               <Row style={{ marginTop: 20 }}>
                 {
-                  currentGames &&
+                  this.filterCurrentGames(currentGames) &&
                   <MaterialTable
                     columns={[
                       { title: "Opponent", field: "player1.username" },
@@ -78,7 +85,7 @@ class Home extends React.Component<HProps, HState> {
                       { title: "Player 2 Score", field: "player2Score" },
                       { title: "Last Updated", field: "updatedAt" }
                     ]}
-                    data={currentGames}
+                    data={this.filterCurrentGames(currentGames)}
                     title="Current Games"
                     options={{
                       pageSize: 5,
@@ -90,7 +97,7 @@ class Home extends React.Component<HProps, HState> {
             </Col>
             <Col>
               {
-                finishedGames &&
+                this.filterFinishedGames(currentGames) &&
                 <MaterialTable
                   columns={[
                     { title: "Player 1", field: "player1.username" },
@@ -99,7 +106,7 @@ class Home extends React.Component<HProps, HState> {
                     { title: "Player 1 Score", field: "player1Score" },
                     { title: "Player 2 Score", field: "player2Score" }
                   ]}
-                  data={finishedGames}
+                  data={this.filterFinishedGames(currentGames)}
                   title="Finished Games"
                   options={{
                     pageSize: 5,
@@ -119,7 +126,6 @@ const mapStateToProps = (state: HState) => ({
   currentUser: state.currentUser,
   game: state.game,
   currentGames: state.currentGames,
-  finishedGames: state.finishedGames
 });
 
-export default connect(mapStateToProps, { createGame, getCurrentGames, getFinishedGames })(Home);
+export default connect(mapStateToProps, { createGame, getCurrentGames })(Home);

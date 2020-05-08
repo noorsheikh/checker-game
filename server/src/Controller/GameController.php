@@ -169,50 +169,19 @@ class GameController extends BaseController
   }
 
   /**
-   * @Route("/current-games/{userId}", requirements={"userId": "\d+"}, name="current_games")
+   * @Route("/current-games/{userId}", requirements={"userId": "\d+"}, name="current_games", methods={"GET"})
    */
   public function currentGames(int $userId): JsonResponse
   {
-    $result = $this->getDoctrine()
+    $games = $this->getDoctrine()
       ->getRepository(Game::class)
-      ->getCurrentGames($userId);
+      ->getCurrentAndFinishedGames($userId);
 
-    $currentGames = [];
-    foreach ($result as $g)
-    {
-      $game = $this
-        ->getDoctrine()
-        ->getRepository(Game::class)
-        ->find($g['id'])
-      ;
-
-      array_push($currentGames, $this->buildResponse($game));
+    $response = [];
+    foreach ($games as $game) {
+      $response[] = $this->buildResponse($game);
     }
 
-    return $this->json($currentGames);
-  }
-
-  /**
-   * @Route("/finished-games", name="finished_games")
-   */
-  public function finishedGames(): JsonResponse
-  {
-    $result = $this->getDoctrine()
-      ->getRepository(Game::class)
-      ->getFinishedGames();
-
-    $finishedGames = [];
-    foreach ($result as $g)
-    {
-      $game = $this
-        ->getDoctrine()
-        ->getRepository(Game::class)
-        ->find($g['id'])
-      ;
-
-      array_push($finishedGames, $this->buildResponse($game));
-    }
-
-    return $this->json($finishedGames);
+    return $this->json($response);
   }
 }

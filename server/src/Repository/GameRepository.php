@@ -48,43 +48,17 @@ class GameRepository extends ServiceEntityRepository
     }
     */
 
-    public function getCurrentGames(int $userId)
+    public function getCurrentAndFinishedGames(int $userId)
     {
-        $em = $this->getEntityManager();
-
-        $query = $em->createQueryBuilder()
-            ->select('g.id,
-                IDENTITY(g.player1) as player1,
-                IDENTITY(g.player2) as player2,
-                IDENTITY(g.winner) as winner,
-                g.boardState,
-                g.createdAt,
-                g.updatedAt')
-            ->from('Checker:Game', 'g')
-            ->where('g.winner IS NULL')
-            ->andWhere('g.player1 = :userId OR g.player2 = :userId')
+        return $this->createQueryBuilder('g')
+            ->where('g.player1 = :userId')
+            ->andWhere('g.gameStatus != :gameStatus')
+            ->orWhere('g.player2 = :userId')
+            ->orWhere('g.winner IS NOT NULL')
+            ->setParameter('gameStatus', 'not-started')
             ->setParameter('userId', $userId)
-            ->getQuery();
-
-        return $query->getResult();
-    }
-
-    public function getFinishedGames()
-    {
-        $em = $this->getEntityManager();
-
-        $query = $em->createQueryBuilder()
-            ->select('g.id,
-                IDENTITY(g.player1) as player1,
-                IDENTITY(g.player2) as player2,
-                IDENTITY(g.winner) as winner,
-                g.boardState,
-                g.createdAt,
-                g.updatedAt')
-            ->from('Checker:Game', 'g')
-            ->where('g.winner IS NOT NULL')
-            ->getQuery();
-
-        return $query->getResult();
+            ->getQuery()
+            ->getResult()
+        ;
     }
 }

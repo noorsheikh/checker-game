@@ -8,15 +8,9 @@ export interface GameState {
   error: string[];
 }
 
-export interface CurrentGamesState {
+export interface GamesState {
   pending: boolean;
-  currentGames: Game[];
-  error: string[];
-}
-
-export interface FinishedGamesState {
-  pending: boolean;
-  finishedGames: Game[];
+  games: Game[];
   error: string[];
 }
 
@@ -83,40 +77,14 @@ export const getCurrentGamesReducer = (state: any = null, action: AnyAction) => 
       return {
         ...state,
         pending: false,
-        currentGames: action.payload,
+        games: action.payload,
         error: null,
       };
     case GameActionTypes.GAME_ERROR:
       return {
         ...state,
         pending: false,
-        currentGames: null,
-        error: action.error,
-      };
-    default:
-      return state;
-  }
-};
-
-export const getFinishedGamesReducer = (state: any = null, action: AnyAction) => {
-  switch (action.type) {
-    case GameActionTypes.GAME_PENDING:
-      return {
-        ...state,
-        pending: true,
-      };
-    case GameActionTypes.GAME_SUCCESS:
-      return {
-        ...state,
-        pending: false,
-        finishedGames: action.payload,
-        error: null,
-      };
-    case GameActionTypes.GAME_ERROR:
-      return {
-        ...state,
-        pending: false,
-        finishedGames: null,
+        games: null,
         error: action.error,
       };
     default:
