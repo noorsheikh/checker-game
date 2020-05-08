@@ -47,4 +47,14 @@ class GameRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getCurrentAndFinishedGames(int $userId)
+    {
+        return $this->createQueryBuilder('g')
+            ->where('g.gameStatus != :gameStatus')
+            ->setParameter('gameStatus', 'not-started')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
