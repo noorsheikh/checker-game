@@ -8,6 +8,18 @@ export interface GameState {
   error: string[];
 }
 
+export interface CurrentGamesState {
+  pending: boolean;
+  currentGames: Game[];
+  error: string[];
+}
+
+export interface FinishedGamesState {
+  pending: boolean;
+  finishedGames: Game[];
+  error: string[];
+}
+
 export const createGameReducer = (state: any = null, action: AnyAction) => {
   switch (action.type) {
     case GameActionTypes.GAME_PENDING:
@@ -53,6 +65,58 @@ export const updateGameReducer = (state: any = null, action: AnyAction) => {
         ...state,
         pending: false,
         game: null,
+        error: action.error,
+      };
+    default:
+      return state;
+  }
+};
+
+export const getCurrentGamesReducer = (state: any = null, action: AnyAction) => {
+  switch (action.type) {
+    case GameActionTypes.GAME_PENDING:
+      return {
+        ...state,
+        pending: true,
+      };
+    case GameActionTypes.GAME_SUCCESS:
+      return {
+        ...state,
+        pending: false,
+        currentGames: action.payload,
+        error: null,
+      };
+    case GameActionTypes.GAME_ERROR:
+      return {
+        ...state,
+        pending: false,
+        currentGames: null,
+        error: action.error,
+      };
+    default:
+      return state;
+  }
+};
+
+export const getFinishedGamesReducer = (state: any = null, action: AnyAction) => {
+  switch (action.type) {
+    case GameActionTypes.GAME_PENDING:
+      return {
+        ...state,
+        pending: true,
+      };
+    case GameActionTypes.GAME_SUCCESS:
+      return {
+        ...state,
+        pending: false,
+        finishedGames: action.payload,
+        error: null,
+      };
+    case GameActionTypes.GAME_ERROR:
+      return {
+        ...state,
+        pending: false,
+        finishedGames: null,
         error: action.error,
       };
     default:

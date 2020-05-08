@@ -167,4 +167,52 @@ class GameController extends BaseController
 
     return $response;
   }
+
+  /**
+   * @Route("/current-games/{userId}", requirements={"userId": "\d+"}, name="current_games")
+   */
+  public function currentGames(int $userId): JsonResponse
+  {
+    $result = $this->getDoctrine()
+      ->getRepository(Game::class)
+      ->getCurrentGames($userId);
+
+    $currentGames = [];
+    foreach ($result as $g)
+    {
+      $game = $this
+        ->getDoctrine()
+        ->getRepository(Game::class)
+        ->find($g['id'])
+      ;
+
+      array_push($currentGames, $this->buildResponse($game));
+    }
+
+    return $this->json($currentGames);
+  }
+
+  /**
+   * @Route("/finished-games", name="finished_games")
+   */
+  public function finishedGames(): JsonResponse
+  {
+    $result = $this->getDoctrine()
+      ->getRepository(Game::class)
+      ->getFinishedGames();
+
+    $finishedGames = [];
+    foreach ($result as $g)
+    {
+      $game = $this
+        ->getDoctrine()
+        ->getRepository(Game::class)
+        ->find($g['id'])
+      ;
+
+      array_push($finishedGames, $this->buildResponse($game));
+    }
+
+    return $this->json($finishedGames);
+  }
 }
