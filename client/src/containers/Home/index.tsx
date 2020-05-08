@@ -6,6 +6,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { createGame } from '../../actions/game';
 import { Redirect } from 'react-router-dom';
 import { GameState } from '../../reducers/game';
+import Leaderboard from '../../components/Leaderboard';
 
 interface HProps {
   currentUser: CurrentUserState;
@@ -37,8 +38,9 @@ class Home extends React.Component<HProps, HState> {
       <React.Fragment>
         <Header {...currentUser} />
         <Container>
-          <Row>
-            <Col style={{ textAlign: 'center', marginTop: 20 }}>
+          <Row style={{ marginTop: 20 }}>
+            <Col><Leaderboard /></Col>
+            <Col style={{ textAlign: 'center' }}>
               <Button variant="primary" onClick={this.startGame}>
                 Start Game
               </Button>
