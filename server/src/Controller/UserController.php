@@ -6,14 +6,16 @@ use Checker\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @Route("/api/user")
+ * @Route("/api")
  */
 class UserController extends BaseController
 {
   /**
-   * @Route("/register", name="register_user", condition="context.getMethod() in ['POST']" )
+   * @Route("/user/register", name="register_user", condition="context.getMethod() in ['POST']" )
    */
   public function register(Request $request): JsonResponse
   {
@@ -52,5 +54,18 @@ class UserController extends BaseController
     $this->getDoctrine()->getManager()->flush();
 
     return $this->json( ['message' => sprintf('User %s successfully registered', $user->getUsername()) ], 200);
+  }
+
+  /**
+   * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+   * @Route("/secure/leaderboard", name="user_leader_board")
+   */
+  public function getLeaderboard(): JsonResponse
+  {
+    $leaderboard = $this->getDoctrine()
+      ->getRepository(User::class)
+      ->getLeaderboard();
+
+    return $this->json($leaderboard);
   }
 }
