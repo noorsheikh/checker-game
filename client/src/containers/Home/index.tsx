@@ -42,17 +42,29 @@ class Home extends React.Component<HProps, HState> {
     return this.props?.history?.push('/game-board');
   };
 
+  playGame = (gameId: number | undefined) => {
+    if (gameId) {
+      this.props.history.push(`/game-board/${gameId}`);
+    }
+  };
+
+  viewMoves = (gameId: number | undefined) => {
+    if(gameId) {
+      // show game moves
+    }
+  }
+
   filterCurrentGames = (games: Game[]) => {
     const id = this.props?.currentUser?.currentUser?.id;
     return games?.filter(game => {
       return game.gameStatus === 'in-progress' && (game?.player1?.id === id || game?.player2?.id === id);
-    })
+    });
   }
 
   filterFinishedGames = (games: Game[]) => {
     return games?.filter(game => {
       return game.winner !== null;
-    })
+    });
   }
 
   render() {
@@ -61,7 +73,13 @@ class Home extends React.Component<HProps, HState> {
       return <Redirect to="/" />;
     }
 
-    const currentGames = this.props?.currentGames?.games;
+    const games = this.props?.currentGames?.games;
+    let currentGames: Game[] = [];
+    let finishedGames: Game[] = [];
+    if (games.length > 0) {
+      currentGames = this.filterCurrentGames(games);
+      finishedGames = this.filterFinishedGames(games);
+    }
 
     return (
       <React.Fragment>
@@ -77,15 +95,28 @@ class Home extends React.Component<HProps, HState> {
               </Row>
               <Row style={{ marginTop: 20 }}>
                 {
-                  this.filterCurrentGames(currentGames).length > 0 &&
+                  currentGames &&
                   <MaterialTable
                     columns={[
-                      { title: "Opponent", field: "player1.username" },
-                      { title: "Player 1 Score", field: "player1Score" },
-                      { title: "Player 2 Score", field: "player2Score" },
-                      { title: "Last Updated", field: "updatedAt" }
+                      { title: "Opponent", render: rowData => {
+                        return rowData.player1?.id === currentUser.id ?
+                          rowData.player1?.username : rowData.player2?.username;
+                      }},
+                      { title: "Your Score", render: rowData => {
+                        return rowData.player1?.id === currentUser.id ?
+                          rowData.player1Score : rowData.player2Score;
+                      }},
+                      { title: "Opponent Score", render: rowData => {
+                        return rowData.player1?.id !== currentUser.id ?
+                          rowData.player1Score : rowData.player2Score;
+                      }},
+                      { title: "Play", render: rowData => {
+                        return (
+                          <Button onClick={() => this.playGame(rowData.id)}>Play</Button>
+                        );
+                      }}
                     ]}
-                    data={this.filterCurrentGames(currentGames)}
+                    data={currentGames}
                     title="Current Games"
                     options={{
                       pageSize: 5,
@@ -97,16 +128,21 @@ class Home extends React.Component<HProps, HState> {
             </Col>
             <Col>
               {
-                this.filterFinishedGames(currentGames).length > 0 &&
+                finishedGames &&
                 <MaterialTable
                   columns={[
                     { title: "Player 1", field: "player1.username" },
                     { title: "Player 2", field: "player2.username" },
                     { title: "Winner", field: "winner.username" },
                     { title: "Player 1 Score", field: "player1Score" },
-                    { title: "Player 2 Score", field: "player2Score" }
+                    { title: "Player 2 Score", field: "player2Score" },
+                    { title: "View", render: rowData => {
+                      return (
+                        <Button onClick={() => this.viewMoves(rowData.id)}>View</Button>
+                      );
+                    }}
                   ]}
-                  data={this.filterFinishedGames(currentGames)}
+                  data={finishedGames}
                   title="Finished Games"
                   options={{
                     pageSize: 5,

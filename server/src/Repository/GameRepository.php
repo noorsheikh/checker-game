@@ -51,12 +51,8 @@ class GameRepository extends ServiceEntityRepository
     public function getCurrentAndFinishedGames(int $userId)
     {
         return $this->createQueryBuilder('g')
-            ->where('g.player1 = :userId')
-            ->andWhere('g.gameStatus != :gameStatus')
-            ->orWhere('g.player2 = :userId')
-            ->orWhere('g.winner IS NOT NULL')
+            ->where('g.gameStatus != :gameStatus')
             ->setParameter('gameStatus', 'not-started')
-            ->setParameter('userId', $userId)
             ->getQuery()
             ->getResult()
         ;
