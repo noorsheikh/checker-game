@@ -38,6 +38,8 @@ class GameController extends BaseController
       ->setPlayer1score(0)
       ->setPlayer2score(0)
       ->setGameStatus('not-started')
+      ->setPlayerTurn(1)
+      ->setGameLocked(0)
     ;
 
     $validationErrors = $this->validator->validate($game);
@@ -116,6 +118,16 @@ class GameController extends BaseController
       $game->setPlayer2Score(($player2Score));
     }
 
+    $playerTurn = $requestData['playerTurn'] ?? '';
+    if ($playerTurn) {
+      $game->setPlayerTurn($playerTurn);
+    }
+
+    $gameLocked = $requestData['gameLocked'] ?? '';
+    if ($gameLocked) {
+      $game->setGameLocked($gameLocked);
+    }
+
     $game->setUpdatedAt(new \DateTimeImmutable());
 
     $this->getDoctrine()->getManager()->persist($game);
@@ -148,6 +160,8 @@ class GameController extends BaseController
       'createdAt' => $game->getCreatedAt(),
       'updatedAt' => $game->getUpdatedAt(),
       'gameStatus' => $game->getGameStatus(),
+      'playerTurn' => $game->getPlayerTurn(),
+      'gameLocked' => $game->getGameLocked(),
       'player2' => null,
       'winner' => null,
     ];
