@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { UnstartedGamesState } from '../../reducers/game';
+import { GamesState } from '../../reducers/game';
 import { connect } from 'react-redux';
 import { getUnstartedGames, updateGame } from '../../actions/game';
 import { CurrentUserState } from '../../reducers/auth';
@@ -11,14 +11,14 @@ import { Game } from '../../models';
 
 interface JGProps {
   getUnstartedGames: Function;
-  unstartedGames: UnstartedGamesState;
+  unstartedGames: GamesState;
   currentUser: CurrentUserState;
   updateGame: Function;
   history: any;
 }
 
 interface JGState {
-  unstartedGames: UnstartedGamesState;
+  unstartedGames: GamesState;
   currentUser: CurrentUserState;
 }
 

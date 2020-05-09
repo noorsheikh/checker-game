@@ -18,7 +18,7 @@ services:
       - server
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - HTTPS=true
+      - HTTPS=false
       - SSL_KEY_FILE=client.key
       - SSL_CRT_FILE=client.crt
     networks:

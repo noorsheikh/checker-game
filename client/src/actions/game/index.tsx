@@ -64,7 +64,7 @@ export const updateGame = (token: string, gameId: number, gamePayload: Game) => 
     });
   }
 };
-      
+
 export const getGame = (token: string, gameId: number) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
@@ -87,6 +87,7 @@ export const getGame = (token: string, gameId: number) => async (dispatch: Dispa
       error: error?.response?.data?.message,
     });
   }
+}
 
 export const getCurrentGames = (token: string, userId: number) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });

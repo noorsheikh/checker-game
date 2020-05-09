@@ -76,7 +76,7 @@ class Home extends React.Component<HProps, HState> {
     const games = this.props?.currentGames?.games;
     let currentGames: Game[] = [];
     let finishedGames: Game[] = [];
-    if (games.length > 0) {
+    if (games?.length > 0) {
       currentGames = this.filterCurrentGames(games);
       finishedGames = this.filterFinishedGames(games);
     }
@@ -86,47 +86,54 @@ class Home extends React.Component<HProps, HState> {
         <Header {...currentUser} />
         <Container>
           <Row style={{ marginTop: 20 }}>
-            <Col><Leaderboard /></Col>
             <Col style={{ textAlign: 'center' }}>
-              <Row>
-                <Button variant="primary" onClick={this.startGame}>
-                  Start Game
-                </Button>
-              </Row>
-              <Row style={{ marginTop: 20 }}>
-                {
-                  currentGames &&
-                  <MaterialTable
-                    columns={[
-                      { title: "Opponent", render: rowData => {
-                        return rowData.player1?.id === currentUser.id ?
-                          rowData.player1?.username : rowData.player2?.username;
-                      }},
-                      { title: "Your Score", render: rowData => {
-                        return rowData.player1?.id === currentUser.id ?
-                          rowData.player1Score : rowData.player2Score;
-                      }},
-                      { title: "Opponent Score", render: rowData => {
-                        return rowData.player1?.id !== currentUser.id ?
-                          rowData.player1Score : rowData.player2Score;
-                      }},
-                      { title: "Play", render: rowData => {
-                        return (
-                          <Button onClick={() => this.playGame(rowData.id)}>Play</Button>
-                        );
-                      }}
-                    ]}
-                    data={currentGames}
-                    title="Current Games"
-                    options={{
-                      pageSize: 5,
-                      search: false
-                    }}
-                  />
-                }
-              </Row>
+              <Button variant="primary" onClick={this.startGame} size='lg' block>
+                Start Game
+              </Button>
             </Col>
-            <Col>
+            <Col style={{ textAlign: 'center', }}>
+              <Button as={NavLink} to='/join-game' variant="success" size='lg' block>
+                Join Game
+              </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col><Leaderboard /></Col>
+          </Row>
+          <Row>
+            <Col lg={12} style={{ marginTop: 20 }}>
+              {
+                currentGames &&
+                <MaterialTable
+                  columns={[
+                    { title: "Opponent", render: rowData => {
+                      return rowData.player1?.id === currentUser.id ?
+                        rowData.player1?.username : rowData.player2?.username;
+                    }},
+                    { title: "Your Score", render: rowData => {
+                      return rowData.player1?.id === currentUser.id ?
+                        rowData.player1Score : rowData.player2Score;
+                    }},
+                    { title: "Opponent Score", render: rowData => {
+                      return rowData.player1?.id !== currentUser.id ?
+                        rowData.player1Score : rowData.player2Score;
+                    }},
+                    { title: "Play", render: rowData => {
+                      return (
+                        <Button onClick={() => this.playGame(rowData.id)}>Play</Button>
+                      );
+                    }}
+                  ]}
+                  data={currentGames}
+                  title="Current Games"
+                  options={{
+                    pageSize: 5,
+                    search: false
+                  }}
+                />
+              }
+            </Col>
+            <Col lg={12} style={{ marginTop: 20 }}>
               {
                 finishedGames &&
                 <MaterialTable
@@ -150,11 +157,6 @@ class Home extends React.Component<HProps, HState> {
                   }}
                 />
               }
-            </Col>
-            <Col style={{ textAlign: 'center', marginTop: 20 }}>
-              <Button as={NavLink} to='/join-game' variant="success" size='lg' block>
-                Join Game
-              </Button>
             </Col>
           </Row>
         </Container>
