@@ -200,4 +200,21 @@ class GameController extends BaseController
 
     return $response;
   }
+
+  /**
+   * @Route("/current-games/{userId}", requirements={"userId": "\d+"}, name="current_games", methods={"GET"})
+   */
+  public function currentGames(int $userId): JsonResponse
+  {
+    $games = $this->getDoctrine()
+      ->getRepository(Game::class)
+      ->getCurrentAndFinishedGames($userId);
+
+    $response = [];
+    foreach ($games as $game) {
+      $response[] = $this->buildResponse($game);
+    }
+
+    return $this->json($response);
+  }
 }
