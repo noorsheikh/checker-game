@@ -57,7 +57,7 @@ class SignUp extends React.Component<SIProps, SIState> {
 
   render() {
     const register = this.props?.register;
-    if (register?.user?.username) {
+    if (register?.user) {
       return <Redirect to="/" />;
     }
     return (

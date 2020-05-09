@@ -1,11 +1,10 @@
-import { User } from '../../models/User';
 import { LeaderboardPlayer } from '../../models/Leaderboard';
 import { RegisterUserActionTypes, UserActionTypes } from '../../actions/user';
 import { AnyAction } from 'redux';
 
 export interface RegisterUserState {
   type: string;
-  user: User;
+  user: string;
   error: string[];
 }
 

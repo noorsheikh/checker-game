@@ -18,13 +18,13 @@ class Game
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\User", inversedBy="gameMoves")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User", inversedBy="game")
      * @ORM\JoinColumn(nullable=false)
      */
     private $player1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Checker\Entity\User", inversedBy="gameMoves")
+     * @ORM\ManyToOne(targetEntity="Checker\Entity\User")
      * @ORM\JoinColumn(nullable=true)
      */
     private $player2;

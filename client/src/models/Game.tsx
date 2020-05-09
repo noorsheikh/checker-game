@@ -16,4 +16,6 @@ export interface Game {
   player1?: Player;
   player2?: Player;
   winner?: Player;
+  player2Id?: number;
+  winnderId?: number;
 }

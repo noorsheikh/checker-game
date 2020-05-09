@@ -65,12 +65,36 @@ export const updateGame = (token: string, gameId: number, gamePayload: Game) => 
   }
 };
 
-export const getCurrentGames = (token: string, userId: number) => async (dispatch: Dispatch) => {
+export const getGame = (token: string, gameId: number) => async (dispatch: Dispatch) => {
+  dispatch({ type: GameActionTypes.GAME_PENDING });
+  try {
+    const game = await axios.get(
+      `http://localhost:80/api/secure/game-board/${gameId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    dispatch({
+      type: GameActionTypes.GAME_SUCCESS,
+      payload: game?.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GameActionTypes.GAME_ERROR,
+      error: error?.response?.data?.message,
+    });
+  }
+}
+
+export const getCurrentGames = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
     const http = authHttpFlag === '1' ? 'http' : 'https';
     const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + `/api/secure/current-games/${userId}`;
+    const url = http + '://' + host + ':' + port + `/api/secure/current-games`;
     const currentGames = await axios.get(
       url,
       {

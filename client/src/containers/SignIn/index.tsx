@@ -26,7 +26,7 @@ class SignIn extends React.Component<SIProps, SIState> {
 
   handleUserLoginChange = (event: any) => {
     const { name, value } = event.currentTarget;
-    this.setState({ [name]: value } as SIState, () => console.log());
+    this.setState({ [name]: value } as SIState, () => this.state);
   };
 
   handleSignInSubmit = (event: React.FormEvent<HTMLFormElement>) => {

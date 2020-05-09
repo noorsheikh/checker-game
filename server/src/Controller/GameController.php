@@ -113,13 +113,27 @@ class GameController extends BaseController
 
     $player2Score = $requestData['player2Score'] ?? '';
     if ($player2Score) {
-      $game->setPlayer2Score(($player1Score));
+      $game->setPlayer2Score(($player2Score));
     }
 
     $game->setUpdatedAt(new \DateTimeImmutable());
 
     $this->getDoctrine()->getManager()->persist($game);
     $this->getDoctrine()->getManager()->flush();
+
+    return $this->json($this->buildResponse($game));
+  }
+
+  /**
+   * @Route("/game-board/{id}", requirements={"id": "\d+"}, name="get_game_board", methods={"GET"})
+   */
+  public function getGameBoard(int $id): JsonResponse
+  {
+    $game = $this
+      ->getDoctrine()
+      ->getRepository(Game::class)
+      ->find($id)
+    ;
 
     return $this->json($this->buildResponse($game));
   }
@@ -149,19 +163,19 @@ class GameController extends BaseController
 
     if ($game->getPlayer2() instanceof User) {
       $response['player2'] = [
-        'id' => $game->getPlayer1()->getId(),
-        'firstName' => $game->getPlayer1()->getFirstName(),
-        'lastName' => $game->getPlayer1()->getLastName(),
-        'username' => $game->getPlayer1()->getUsername(),
+        'id' => $game->getPlayer2()->getId(),
+        'firstName' => $game->getPlayer2()->getFirstName(),
+        'lastName' => $game->getPlayer2()->getLastName(),
+        'username' => $game->getPlayer2()->getUsername(),
       ];
     }
 
     if ($game->getWinner() instanceof User) {
       $response['winner'] = [
-        'id' => $game->getPlayer1()->getId(),
-        'firstName' => $game->getPlayer1()->getFirstName(),
-        'lastName' => $game->getPlayer1()->getLastName(),
-        'username' => $game->getPlayer1()->getUsername(),
+        'id' => $game->getWinner()->getId(),
+        'firstName' => $game->getWinner()->getFirstName(),
+        'lastName' => $game->getWinner()->getLastName(),
+        'username' => $game->getWinner()->getUsername(),
       ];
     }
 
@@ -169,13 +183,13 @@ class GameController extends BaseController
   }
 
   /**
-   * @Route("/current-games/{userId}", requirements={"userId": "\d+"}, name="current_games", methods={"GET"})
+   * @Route("/current-games/", name="current_games", methods={"GET"})
    */
-  public function currentGames(int $userId): JsonResponse
+  public function currentGames(): JsonResponse
   {
     $games = $this->getDoctrine()
       ->getRepository(Game::class)
-      ->getCurrentAndFinishedGames($userId);
+      ->findAll();
 
     $response = [];
     foreach ($games as $game) {
