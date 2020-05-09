@@ -89,12 +89,12 @@ export const getGame = (token: string, gameId: number) => async (dispatch: Dispa
   }
 }
 
-export const getCurrentGames = (token: string, userId: number) => async (dispatch: Dispatch) => {
+export const getCurrentGames = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
     const http = authHttpFlag === '1' ? 'http' : 'https';
     const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + `/api/secure/current-games/${userId}`;
+    const url = http + '://' + host + ':' + port + `/api/secure/current-games`;
     const currentGames = await axios.get(
       url,
       {
@@ -107,30 +107,6 @@ export const getCurrentGames = (token: string, userId: number) => async (dispatc
     dispatch({
       type: GameActionTypes.GAME_SUCCESS,
       payload: currentGames?.data,
-    });
-  } catch (error) {
-    dispatch({
-      type: GameActionTypes.GAME_ERROR,
-      error: error?.response?.data?.message,
-    });
-  }
-};
-
-export const getUnstartedGames = (token: string, userId: number) => async (dispatch: Dispatch) => {
-  dispatch({ type: GameActionTypes.GAME_PENDING });
-  try {
-    const game = await axios.get(
-      `http://localhost:80/api/secure/unstarted-games/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-    dispatch({
-      type: GameActionTypes.GAME_SUCCESS,
-      payload: game?.data,
     });
   } catch (error) {
     dispatch({

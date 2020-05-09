@@ -92,32 +92,6 @@ export const getGameReducer = (state: any = null, action: AnyAction) => {
   }
 };
 
-export const getUnstartedGamesReducer = (state: any = null, action: AnyAction) => {
-  switch (action.type) {
-    case GameActionTypes.GAME_PENDING:
-      return {
-        ...state,
-        pending: true,
-      };
-    case GameActionTypes.GAME_SUCCESS:
-      return {
-        ...state,
-        pending: false,
-        games: action.payload,
-        error: null,
-      };
-    case GameActionTypes.GAME_ERROR:
-      return {
-        ...state,
-        pending: false,
-        games: null,
-        error: action.error,
-      };
-    default:
-      return state;
-  }
-};
-
 export const getCurrentGamesReducer = (state: any = null, action: AnyAction) => {
   switch (action.type) {
     case GameActionTypes.GAME_PENDING:

@@ -138,25 +138,6 @@ class GameController extends BaseController
     return $this->json($this->buildResponse($game));
   }
 
-  /**
-   * @Route("/unstarted-games/{id}", requirements={"id": "\d+"}, name="get_unstarted_games", methods={"GET"})
-   */
-  public function getUnstartedGames(int $id): JsonResponse
-  {
-    $games = $this
-      ->getDoctrine()
-      ->getRepository(Game::class)
-      ->getUnstartedGames($id)
-    ;
-
-    $response = [];
-    foreach ($games as $game) {
-      $response[] = $this->buildResponse($game);
-    }
-
-    return $this->json($response);
-  }
-
   private function buildResponse(Game $game): array
   {
     $response = [
@@ -202,13 +183,13 @@ class GameController extends BaseController
   }
 
   /**
-   * @Route("/current-games/{userId}", requirements={"userId": "\d+"}, name="current_games", methods={"GET"})
+   * @Route("/current-games/", name="current_games", methods={"GET"})
    */
-  public function currentGames(int $userId): JsonResponse
+  public function currentGames(): JsonResponse
   {
     $games = $this->getDoctrine()
       ->getRepository(Game::class)
-      ->getCurrentAndFinishedGames($userId);
+      ->findAll();
 
     $response = [];
     foreach ($games as $game) {

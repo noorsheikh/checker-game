@@ -238,9 +238,9 @@ class User implements UserInterface
   /**
    * @return Collection|Game[]
    */
-  public function getGame(): Collection
+  public function getGame()
   {
-    return $this->gameMoves;
+    return $this->game;
   }
 
   public function addGame(Game $game): self

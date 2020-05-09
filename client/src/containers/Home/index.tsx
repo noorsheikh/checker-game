@@ -2,12 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
 import Header from '../../components/Header';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-import { Redirect, NavLink } from 'react-router-dom';
+import { Container, Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
 import MaterialTable from "material-table";
 import { createGame, getCurrentGames } from '../../actions/game';
 import { GameState, GamesState } from '../../reducers/game';
 import Leaderboard from '../../components/Leaderboard';
+import { updateGame } from '../../actions/game';
 import { Game } from '../../models';
 
 interface HProps {
@@ -18,20 +19,25 @@ interface HProps {
   getCurrentGames: Function;
   currentGames: GamesState;
   getFinishedGames: Function;
+  updateGame: Function;
 }
 
 interface HState {
   currentUser: CurrentUserState;
   game?: GameState;
   currentGames: GamesState;
+  joinGame?: Game;
 }
 
 class Home extends React.Component<HProps, HState> {
   componentDidMount() {
     const currentUser = this.props?.currentUser?.currentUser;
     if (currentUser) {
-      const { token, id } = currentUser;
-      this.props.getCurrentGames(token, id);
+      const { token } = currentUser;
+      this.props.getCurrentGames(token);
+      if (this.props?.currentGames?.games?.length > 0) {
+        this.setState({ joinGame: this.getCurrentGameToJoin() }, () => this.state?.joinGame);
+      }
     }
   }
 
@@ -44,7 +50,7 @@ class Home extends React.Component<HProps, HState> {
 
   playGame = (gameId: number | undefined) => {
     if (gameId) {
-      this.props.history.push(`/game-board/${gameId}`);
+      this.joinGame(gameId);
     }
   };
 
@@ -67,11 +73,32 @@ class Home extends React.Component<HProps, HState> {
     });
   }
 
+  getCurrentGameToJoin = () => {
+    const games = this.props?.currentGames?.games;
+    const currentUserId = this.props?.currentUser?.currentUser?.id;
+    return games?.filter(game => {
+      return game.gameStatus === 'not-started' &&
+      game.player2 === null &&
+      game.winner === null &&
+      game.player1?.id !== currentUserId
+    }).reverse()[0];
+  }
+
+  joinGame = (id?: number) => {
+    const token = this.props?.currentUser?.currentUser?.token;
+    const userId = this.props?.currentUser?.currentUser?.id;
+    let gameId = id || this.state?.joinGame?.id;
+    this.props.updateGame(token, gameId, { player2Id: userId, gameStatus: 'in-progress' } as Game);
+    this.props.history.push('/game-board');
+  }
+
   render() {
     const currentUser = this.props?.currentUser?.currentUser;
     if (!currentUser?.isLoggedIn) {
       return <Redirect to="/" />;
     }
+
+    const joinGame = this.state?.joinGame;
 
     const games = this.props?.currentGames?.games;
     let currentGames: Game[] = [];
@@ -92,13 +119,24 @@ class Home extends React.Component<HProps, HState> {
               </Button>
             </Col>
             <Col style={{ textAlign: 'center', }}>
-              <Button as={NavLink} to='/join-game' variant="success" size='lg' block>
-                Join Game
-              </Button>
+              {joinGame?.id
+                ?
+                  <Button variant="success" onClick={() => this.joinGame()} size='lg' block>
+                    Join Game
+                  </Button>
+                :
+                  <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">There is no game available to join!</Tooltip>}>
+                    <span>
+                      <Button variant="success" style={{ pointerEvents: 'none' }} size='lg' block disabled>
+                        Join Game
+                      </Button>
+                    </span>
+                  </OverlayTrigger>
+              }
             </Col>
           </Row>
           <Row>
-            <Col><Leaderboard /></Col>
+            <Col style={{ marginTop: 20 }}><Leaderboard /></Col>
           </Row>
           <Row>
             <Col lg={12} style={{ marginTop: 20 }}>
@@ -171,4 +209,4 @@ const mapStateToProps = (state: HState) => ({
   currentGames: state.currentGames,
 });
 
-export default connect(mapStateToProps, { createGame, getCurrentGames })(Home);
+export default connect(mapStateToProps, { createGame, getCurrentGames, updateGame })(Home);
