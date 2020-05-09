@@ -18,4 +18,6 @@ export interface Game {
   winner?: Player;
   player2Id?: number;
   winnderId?: number;
+  playerTurn?: number;
+  gameLocked?: number;
 }

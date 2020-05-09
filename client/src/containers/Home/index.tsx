@@ -99,6 +99,7 @@ class Home extends React.Component<HProps, HState> {
     }
 
     const joinGame = this.state?.joinGame;
+    console.log(joinGame);
 
     const games = this.props?.currentGames?.games;
     let currentGames: Game[] = [];

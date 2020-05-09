@@ -68,6 +68,16 @@ class Game
      */
     private $gameStatus;
 
+    /**
+     * @ORM\Column(name="player_turn", type="integer", nullable=false)
+     */
+    private $playerTurn = 1;
+
+    /**
+     * @ORM\Column(name="game_locked", type="integer", nullable=false)
+     */
+    private $gameLocked = 0;
+
     public function __construct()
     {
         if (!$this->getCreatedAt()) {
@@ -185,6 +195,30 @@ class Game
     public function setGameStatus(string $gameStatus): ?self
     {
         $this->gameStatus = $gameStatus;
+
+        return $this;
+    }
+
+    public function getPlayerTurn(): int
+    {
+        return $this->playerTurn;
+    }
+
+    public function setPlayerTurn(int $playerTurn): ?self
+    {
+        $this->playerTurn = $playerTurn;
+
+        return $this;
+    }
+
+    public function getGameLocked(): int
+    {
+        return $this->gameLocked;
+    }
+
+    public function setGameLocked(int $gameLocked): ?self
+    {
+        $this->gameLocked = $gameLocked;
 
         return $this;
     }
