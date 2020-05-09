@@ -68,8 +68,11 @@ export const updateGame = (token: string, gameId: number, gamePayload: Game) => 
 export const getGame = (token: string, gameId: number) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
+    const http = authHttpFlag === '1' ? 'http' : 'https';
+    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
+    const url = http + '://' + host + ':' + port + `/api/secure/game-board/${gameId}`;
     const game = await axios.get(
-      `http://localhost:80/api/secure/game-board/${gameId}`,
+      url,
       {
         headers: {
           Authorization: `Bearer ${token}`,
