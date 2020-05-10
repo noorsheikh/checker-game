@@ -218,7 +218,7 @@ class GameController extends BaseController
   }
 
   /**
-   * @Route("/current-games/", name="current_games", methods={"GET"})
+   * @Route("/current-games", name="current_games", methods={"GET"})
    */
   public function currentGames(): JsonResponse
   {
@@ -269,14 +269,8 @@ class GameController extends BaseController
     $this->getDoctrine()->getManager()->persist($gameMove);
     $this->getDoctrine()->getManager()->flush();
 
-    $response = [
-      'id' => $gameMove->getId(),
-      'game' => $gameMove->getGame(),
-      'boardState' => json_decode($gameMove->getBoardState()),
-      'player' => $gameMove->getPlayer(),
-      'timestamp' => $gameMove->getTimestamp()
-    ];
+    $game = $this->getDoctrine()->getRepository(Game::class)->find($gameId);
 
-    return $this->json($response);
+    return $this->json($this->buildResponse($game));
   }
 }
