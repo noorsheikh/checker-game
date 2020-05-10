@@ -187,8 +187,8 @@ class GameBoard extends React.Component<BProps, BState> {
     // if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
     const boardState = this.props.game?.game?.boardState || [];
     const boardValue = boardState[position?.row][position?.column];
-    let player1score = this.state.player1score;
-    let player2score = this.state.player2score;
+    let player1score = this.props.game?.game?.player1Score || 0;
+    let player2score = this.props.game?.game?.player2Score || 0;
     if (boardValue === 1 || boardValue === 3) player2score++;
     else if (boardValue === 2 || boardValue === 4) player1score++;
     boardState[position?.row][position?.column] = 0;
