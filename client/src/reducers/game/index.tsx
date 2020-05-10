@@ -123,29 +123,3 @@ export const getCurrentGamesReducer = (state: any = null, action: AnyAction) => 
       return state;
   }
 };
-
-export const addGameMoveReducer = (state: any = null, action: AnyAction) => {
-  switch (action.type) {
-    case GameActionTypes.GAME_PENDING:
-      return {
-        ...state,
-        pending: true,
-      };
-    case GameActionTypes.GAME_SUCCESS:
-      return {
-        ...state,
-        pending: false,
-        gameMoves: action.payload,
-        error: null,
-      };
-    case GameActionTypes.GAME_ERROR:
-      return {
-        ...state,
-        pending: false,
-        gameMoves: null,
-        error: action.error,
-      };
-    default:
-      return state;
-  }
-};
