@@ -61,8 +61,10 @@ class Home extends React.Component<HProps, HState> {
   };
 
   playGame = (gameId: number | undefined) => {
-    if (gameId) {
-      this.joinGame(gameId);
+    if (gameId && this.props?.currentUser?.currentUser) {
+      const token = this.props?.currentUser?.currentUser?.token;
+      this.props.updateGame(token, gameId, { } as Game);
+      this.props.history.push('/game-board');
     }
   };
 
@@ -196,7 +198,7 @@ class Home extends React.Component<HProps, HState> {
                   columns={[
                     { title: "Opponent", render: rowData => {
                       return rowData.player1?.id === currentUser.id ?
-                        rowData.player1?.username : rowData.player2?.username;
+                        rowData.player2?.username : rowData.player1?.username;
                     }},
                     { title: "Your Score", render: rowData => {
                       return rowData.player1?.id === currentUser.id ?
@@ -205,6 +207,14 @@ class Home extends React.Component<HProps, HState> {
                     { title: "Opponent Score", render: rowData => {
                       return rowData.player1?.id !== currentUser.id ?
                         rowData.player1Score : rowData.player2Score;
+                    }},
+                    { title: "Your Turn", render: rowData => {
+                      if ((rowData.playerTurn === 1 && rowData.player1?.id === currentUser.id) ||
+                        (rowData.playerTurn === 2 && rowData.player2?.id === currentUser.id)) {
+                        return "Yes";
+                      } else {
+                        return "No";
+                      }
                     }},
                     { render: rowData => {
                       return (

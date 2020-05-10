@@ -233,4 +233,50 @@ class GameController extends BaseController
 
     return $this->json($response);
   }
+
+  /**
+   * @Route("/game-move/add", name="add_game_move")
+   */
+  public function addGameMove(Request $request): JsonResponse
+  {
+    $requestData = json_decode($request->getContent(), true);
+
+    $gameMove = new GameMove();
+
+    $gameId = $requestData['gameId'] ?? '';
+    if ($gameId) {
+      $game = $this->getDoctrine()->getRepository(Game::class)->find($gameId);
+      if ($game instanceof Game) {
+        $gameMove->setGame($game);
+      }
+    }
+
+    $playerId = $requestData['playerId'] ?? '';
+    if ($playerId) {
+      $player = $this->getDoctrine()->getRepository(User::class)->find($playerId);
+      if ($player instanceof User) {
+        $gameMove->setPlayer($player);
+      }
+    }
+
+    $boardState = $requestData['boardState'] ?? '';
+    if ($boardState) {
+      $gameMove->setBoardState(json_encode($boardState));
+    }
+
+    $gameMove->setTimestamp(new \DateTimeImmutable());
+
+    $this->getDoctrine()->getManager()->persist($gameMove);
+    $this->getDoctrine()->getManager()->flush();
+
+    $response = [
+      'id' => $gameMove->getId(),
+      'game' => $gameMove->getGame(),
+      'boardState' => json_decode($gameMove->getBoardState()),
+      'player' => $gameMove->getPlayer(),
+      'timestamp' => $gameMove->getTimestamp()
+    ];
+
+    return $response;
+  }
 }
