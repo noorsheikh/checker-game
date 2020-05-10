@@ -4,6 +4,7 @@ namespace Checker\Controller;
 
 use Checker\Entity\Game;
 use Checker\Entity\User;
+use Checker\Entity\GameMove;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -192,6 +193,26 @@ class GameController extends BaseController
         'username' => $game->getWinner()->getUsername(),
       ];
     }
+
+    $gameMovesResponse = [];
+    $gameMoves = $game->getGameMoves();
+    foreach ($gameMoves as $move) {
+      if ($move instanceof GameMove) {
+        array_push($gameMovesResponse, [
+          'id' => $move->getId(),
+          'game' => $move->getGame()->getId(),
+          'player' => [
+            'id' => $move->getPlayer()->getId(),
+            'firstName' => $move->getPlayer()->getFirstName(),
+            'lastName' => $move->getPlayer()->getLastName(),
+            'username' => $move->getPlayer()->getUsername(),
+          ],
+          'boardState' => $move->getBoardState(),
+          'timestamp' => $move->getTimestamp(),
+        ]);
+      }
+    }
+    $response['gameMoves'] = $gameMovesResponse;
 
     return $response;
   }

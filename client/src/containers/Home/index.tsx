@@ -1,4 +1,5 @@
 import React from 'react';
+import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { CurrentUserState } from '../../reducers/auth';
 import Header from '../../components/Header';
@@ -27,9 +28,20 @@ interface HState {
   game?: GameState;
   currentGames: GamesState;
   joinGame?: Game;
+  showGameMovesModal: boolean;
+  gameMoves: Game['gameMoves'];
 }
 
 class Home extends React.Component<HProps, HState> {
+  state = {
+    currentUser: {} as CurrentUserState,
+    game: {} as GameState,
+    currentGames: {} as GamesState,
+    joinGame: {} as Game,
+    showGameMovesModal: false,
+    gameMoves: [] as Game['gameMoves']
+  }
+
   componentDidMount() {
     const currentUser = this.props?.currentUser?.currentUser;
     if (currentUser) {
@@ -56,8 +68,16 @@ class Home extends React.Component<HProps, HState> {
 
   viewMoves = (gameId: number | undefined) => {
     if(gameId) {
-      // show game moves
+      let finishedGames = this.filterFinishedGames(this.props?.currentGames?.games);
+      let game = finishedGames.filter(game => {
+        return game.id === gameId;
+      })[0];
+      this.setState({ gameMoves: game.gameMoves, showGameMovesModal: true });
     }
+  }
+
+  handleModalClose = () => {
+    this.setState({ showGameMovesModal: false });
   }
 
   filterCurrentGames = (games: Game[]) => {
@@ -99,7 +119,6 @@ class Home extends React.Component<HProps, HState> {
     }
 
     const joinGame = this.state?.joinGame;
-    console.log(joinGame);
 
     const games = this.props?.currentGames?.games;
     let currentGames: Game[] = [];
@@ -109,10 +128,40 @@ class Home extends React.Component<HProps, HState> {
       finishedGames = this.filterFinishedGames(games);
     }
 
+    let showGameMovesModal = this.state.showGameMovesModal;
+    let gameMoves = this.state.gameMoves;
+
     return (
       <React.Fragment>
         <Header {...currentUser} />
         <Container>
+        <Modal show={showGameMovesModal} onHide={this.handleModalClose} animation={false}>
+          <Modal.Header closeButton>
+            <Modal.Title>Game Moves</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              gameMoves &&
+              <MaterialTable
+                columns={[
+                  { title: "Player", field: "player.username" },
+                  { title: "Move", field: "boardState" }
+                ]}
+                data={gameMoves}
+                options={{
+                  pageSize: 5,
+                  search: false,
+                  showTitle: false
+                }}
+              />
+            }
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleModalClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
           <Row style={{ marginTop: 20 }}>
             <Col style={{ textAlign: 'center' }}>
               <Button variant="primary" onClick={this.startGame} size='lg' block>
@@ -157,7 +206,7 @@ class Home extends React.Component<HProps, HState> {
                       return rowData.player1?.id !== currentUser.id ?
                         rowData.player1Score : rowData.player2Score;
                     }},
-                    { title: "Play", render: rowData => {
+                    { render: rowData => {
                       return (
                         <Button onClick={() => this.playGame(rowData.id)}>Play</Button>
                       );
@@ -182,7 +231,7 @@ class Home extends React.Component<HProps, HState> {
                     { title: "Winner", field: "winner.username" },
                     { title: "Player 1 Score", field: "player1Score" },
                     { title: "Player 2 Score", field: "player2Score" },
-                    { title: "View", render: rowData => {
+                    { render: rowData => {
                       return (
                         <Button onClick={() => this.viewMoves(rowData.id)}>View</Button>
                       );

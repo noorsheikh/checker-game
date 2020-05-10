@@ -5,6 +5,14 @@ interface Player {
   username: string;
 }
 
+interface GameMove {
+  id: number;
+  gameId: number;
+  player: Player;
+  boardState: number[][];
+  timestamp: string;
+}
+
 export interface Game {
   id?: number;
   boardState?: number[][];
@@ -20,4 +28,5 @@ export interface Game {
   winnderId?: number;
   playerTurn?: number;
   gameLocked?: number;
+  gameMoves?: GameMove[];
 }

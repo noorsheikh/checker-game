@@ -2,6 +2,8 @@
 
 namespace Checker\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -78,12 +80,18 @@ class Game
      */
     private $gameLocked = 0;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Checker\Entity\GameMove", mappedBy="game")
+     */
+    private $gameMoves;
+
     public function __construct()
     {
         if (!$this->getCreatedAt()) {
             $now = new \DateTimeImmutable();
             $this->setCreatedAt($now);
         }
+        $this->gameMoves = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -219,6 +227,37 @@ class Game
     public function setGameLocked(int $gameLocked): ?self
     {
         $this->gameLocked = $gameLocked;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|GameMove[]
+     */
+    public function getGameMoves(): Collection
+    {
+        return $this->gameMoves;
+    }
+
+    public function addGameMove(GameMove $gameMove): self
+    {
+        if (!$this->gameMoves->contains($gameMove)) {
+            $this->gameMoves[] = $gameMove;
+            $gameMove->setGame($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGameMove(GameMove $gameMove): self
+    {
+        if ($this->gameMoves->contains($gameMove)) {
+            $this->gameMoves->removeElement($gameMove);
+            // set the owning side to null (unless already changed)
+            if ($gameMove->getGame() === $this) {
+                $gameMove->setGame(null);
+            }
+        }
 
         return $this;
     }
