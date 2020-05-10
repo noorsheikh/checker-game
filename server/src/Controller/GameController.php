@@ -197,7 +197,7 @@ class GameController extends BaseController
   }
 
   /**
-   * @Route("/current-games/", name="current_games", methods={"GET"})
+   * @Route("/current-games", name="current_games", methods={"GET"})
    */
   public function currentGames(): JsonResponse
   {
