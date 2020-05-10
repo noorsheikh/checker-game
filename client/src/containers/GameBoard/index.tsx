@@ -301,10 +301,10 @@ class GameBoard extends React.Component<BProps, BState> {
     const player2Id = this.props?.game?.game?.player2?.id;
     let winner = false;
     if (player1score === 12) {
-      this.props.updateGame(token, gameId, { winnerId: player1Id });
+      this.props.updateGame(token, gameId, { winnerId: player1Id, gameStatus: 'completed' });
       winner = true;
     } else if (player2score === 12) {
-      this.props.updateGame(token, gameId, { winnerId: player2Id });
+      this.props.updateGame(token, gameId, { winnerId: player2Id, gameStatus: 'completed' });
       winner = true;
     }
 
