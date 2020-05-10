@@ -277,6 +277,6 @@ class GameController extends BaseController
       'timestamp' => $gameMove->getTimestamp()
     ];
 
-    return $response;
+    return $this->json($response);
   }
 }
