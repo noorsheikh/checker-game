@@ -75,8 +75,14 @@ class GameController extends BaseController
       return $this->json([ 'message' => 'Game not found' ], 404);
     }
 
-    $boardState = $requestData['boardState'] ?? '';
-    if ($boardState) {
+    $errors = [];
+
+    $boardState = isset($requestData['boardState']) &&  is_array($requestData['boardState']) ? $requestData['boardState'] : '';
+    if ($boardState && !$this->isBoardStateValid($boardState)) {
+      $errors[] = 'Invalid board state';
+    }
+
+    if ($boardState && $this->isBoardStateValid($boardState)) {
       $game->setBoardState(json_encode($boardState));
     }
 
@@ -104,32 +110,63 @@ class GameController extends BaseController
       }
     }
 
-    $gameStatus= $requestData['gameStatus'] ?? '';
-    if ($gameStatus) {
+    $gameStatus = isset($requestData['gameStatus']) ? $requestData['gameStatus'] : '';
+    if ($gameStatus && is_string($gameStatus) && in_array($gameStatus, ['not-started', 'in-progress', 'completed'])) {
       $game->setGameStatus($gameStatus);
     }
 
-    $player1Score = $requestData['player1Score'] ?? '';
-    if ($player1Score) {
+    if ($gameStatus && (!is_string($gameStatus) || !in_array($gameStatus, ['not-started', 'in-progress', 'completed']))) {
+      $errors[] = 'Invalid game status value';
+    }
+
+    $player1Score = isset($requestData['player1Score']) ? $requestData['player1Score'] : '';
+    if ($player1Score && is_numeric($player1Score) && ($player1Score <= 12 && $player1Score >= 0)) {
       $game->setPlayer1Score(($player1Score));
     }
 
-    $player2Score = $requestData['player2Score'] ?? '';
-    if ($player2Score) {
+    if ($player1Score && (!is_numeric($player1Score) || !(($player1Score <= 12 && $player1Score >= 0)))) {
+      $errors[] = 'Invalid player 1 score value';
+    }
+
+    $player2Score = isset($requestData['player2Score']) ? $requestData['player2Score'] : '';
+    if ($player2Score && is_numeric($player2Score) && ($player2Score <= 12 && $player2Score >= 0)) {
       $game->setPlayer2Score(($player2Score));
     }
 
-    $playerTurn = $requestData['playerTurn'] ?? '';
-    if ($playerTurn) {
+    if ($player2Score && (!is_numeric($player2Score) || !(($player2Score <= 12 && $player2Score >= 0)))) {
+      $errors[] = 'Invalid player 2 score value';
+    }
+
+    $playerTurn = isset($requestData['playerTurn']) ? $requestData['playerTurn'] : '';
+    if ($playerTurn && is_numeric($playerTurn) && in_array($playerTurn, [1, 2])) {
       $game->setPlayerTurn($playerTurn);
     }
 
-    $gameLocked = $requestData['gameLocked'] ?? '';
-    if ($gameLocked) {
+    if ($playerTurn && (!is_numeric($playerTurn) || !in_array($playerTurn, [1, 2]))) {
+      $errors[] = 'Invalid player turn value';
+    }
+
+    $gameLocked = isset($requestData['gameLocked']) ? $requestData['gameLocked'] : '';
+    if ($gameLocked && is_numeric($gameLocked) && in_array($gameLocked, [0, 1])) {
       $game->setGameLocked($gameLocked);
     }
 
+    if ($gameLocked && (!is_numeric($gameLocked) || !in_array($gameLocked, [0, 1]))) {
+      $errors[] = 'Invalid game locked value';
+    }
+
     $game->setUpdatedAt(new \DateTimeImmutable());
+
+    $validationErrors = $this->validator->validate($game);
+    if (count($validationErrors) > 0 || count($errors) > 0) {
+      if (count($validationErrors) > 0) {
+        foreach ($validationErrors as $error) {
+          $errors[] = $error->getMessage();
+        }
+      }
+
+      return $this->json([ 'message' =>  $errors ], 416);
+    }
 
     $this->getDoctrine()->getManager()->persist($game);
     $this->getDoctrine()->getManager()->flush();
@@ -272,5 +309,18 @@ class GameController extends BaseController
     $game = $this->getDoctrine()->getRepository(Game::class)->find($gameId);
 
     return $this->json($this->buildResponse($game));
+  }
+
+  private function isBoardStateValid(array $boardState): bool
+  {
+    foreach($boardState as $row) {
+      foreach ($row as $rowItem) {
+        if (!is_numeric($rowItem) || !in_array($rowItem, [0, 1, 2, 3, 4])) {
+          return false;
+        }
+      }
+    };
+
+    return true;
   }
 }
