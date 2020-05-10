@@ -346,6 +346,14 @@ class GameBoard extends React.Component<BProps, BState> {
     return false;
   }
 
+  playerTurnMatchesCurrentPlayer = () => {
+    const { playerTurn, player1, player2 } = this.props?.game?.game;
+    const currentUser = this.props?.currentUser?.currentUser;
+    if (playerTurn === 1 && player1?.id === currentUser.id) return true;
+    else if (playerTurn === 2 && player2?.id === currentUser.id) return true;
+    else return false;
+  }
+
   onTileClick = (tilePosition: any) => {
     // if (DEBUG) console.log('onTileClick:' + JSON.stringify({ tilePosition }));
     const inRange = this.inRange(tilePosition);
@@ -404,7 +412,7 @@ class GameBoard extends React.Component<BProps, BState> {
   onPieceClick = (player: any, position: any, king: any) => {
     // if (DEBUG) console.log('onPieceClick:' + JSON.stringify({ player, position, king }));
     const { playerTurn, gameLocked } = this.props?.game?.game;
-    if (playerTurn === player && gameLocked === 0) {
+    if (playerTurn === player && gameLocked === 0 && this.playerTurnMatchesCurrentPlayer()) {
       const piecesThatCanJump = [];
       for (let row = 0; row < 8; row++) {
         for (let column = 0; column < 8; column++) {
@@ -541,6 +549,8 @@ class GameBoard extends React.Component<BProps, BState> {
       this.pieces = pieces;
     }
 
+    let alert: string = !game?.player2 ? "Waiting for second player to join." : this.state.alert;
+
     return (
       <React.Fragment>
         <Container fluid>
@@ -566,7 +576,7 @@ class GameBoard extends React.Component<BProps, BState> {
                         player1score={game.player1Score || 0}
                         player2score={game.player2Score || 0}
                         winner={game?.winner ? `${game?.winner?.firstName} ${game?.winner?.lastName}` : ''}
-                        alert={this.state.alert}
+                        alert={alert}
                       />
                     </Col>
                     <Col lg={8}>
