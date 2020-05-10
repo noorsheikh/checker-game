@@ -363,7 +363,8 @@ class GameBoard extends React.Component<BProps, BState> {
         if (this.opponentJump(tilePosition)) {
           this.updateAlertState("");
           this.movePiece(tilePosition);
-          const value = this.state.boardState[tilePosition.row][tilePosition.column];
+          const boardState = this.props?.game?.game?.boardState || [];
+          const value = boardState[tilePosition.row][tilePosition.column];
           let player = 1;
           let king = false;
           if (value === 2) player = 2;
@@ -416,8 +417,9 @@ class GameBoard extends React.Component<BProps, BState> {
       const piecesThatCanJump = [];
       for (let row = 0; row < 8; row++) {
         for (let column = 0; column < 8; column++) {
-          const boardValue = this.state.boardState[row][column];
-          if (boardValue !== 0 && this.boardValueMatchesPlayerTurn(boardValue)) {
+          const boardState = this.props?.game?.game?.boardState || [];
+          const boardValue = boardState[row][column];
+          if (boardValue !== 0) {
             let boardPlayer = 1;
             let boardKing = false;
             if (boardValue === 2) boardPlayer = 2;
