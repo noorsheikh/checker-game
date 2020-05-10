@@ -2,8 +2,8 @@ noxlogic_rate_limit:
   enabled: true
   storage_engine: redis
   redis_client: default
-  redis_service: null
-  php_redis_service: null
+  redis_service: \Predis\Client
+  php_redis_service: \Redis
   memcache_client: null
   memcache_service: null
   doctrine_provider: null

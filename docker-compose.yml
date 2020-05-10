@@ -45,7 +45,6 @@ services:
       - mysql
     networks:
       checker_game:
-
   mysql:
     image: mysql:5.7
     restart: always
@@ -54,6 +53,12 @@ services:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: checker_game
+    networks:
+      checker_game:
+  redis:
+    image: redis:6.0.1
+    ports:
+      - 6379:6379
     networks:
       checker_game:
 
