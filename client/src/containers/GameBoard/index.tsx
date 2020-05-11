@@ -40,6 +40,7 @@ interface BState {
   game: GameState;
   winner: string;
   locked: boolean;
+  lockPlayer: boolean;
 }
 
 class GameBoard extends React.Component<BProps, BState> {
@@ -84,6 +85,7 @@ class GameBoard extends React.Component<BProps, BState> {
     winner: "",
     locked: false,
     game: {} as GameState,
+    lockPlayer: false,
   };
 
   pieces = [
@@ -179,7 +181,7 @@ class GameBoard extends React.Component<BProps, BState> {
           if (tilePosition.row === 0) this.makeKing(tilePosition);
         }
       }
-      this.setState({ selectedPiece: {} });
+      this.setState({ selectedPiece: {}, lockPlayer: true });
     }
   };
 
