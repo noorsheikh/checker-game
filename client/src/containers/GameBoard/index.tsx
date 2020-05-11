@@ -151,6 +151,7 @@ class GameBoard extends React.Component<BProps, BState> {
       playerTurn: playerTurn === 1 ? 2 : 1,
     };
     this.props.updateGame(token, id, updateGamePayload);
+    this.setState({ lockPlayer: true });
   };
 
   movePiece = (tilePosition: any) => {
@@ -181,7 +182,7 @@ class GameBoard extends React.Component<BProps, BState> {
           if (tilePosition.row === 0) this.makeKing(tilePosition);
         }
       }
-      this.setState({ selectedPiece: {}, lockPlayer: true });
+      this.setState({ selectedPiece: {} });
     }
   };
 
