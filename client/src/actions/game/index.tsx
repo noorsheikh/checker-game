@@ -32,7 +32,7 @@ export const createGame = (token: string) => async (dispatch: Dispatch) => {
   } catch (error) {
     dispatch({
       type: GameActionTypes.GAME_ERROR,
-      error: error?.response?.data?.message,
+      error: error?.response?.data?.message || 'Cannot create game board',
     });
   }
 };
@@ -60,7 +60,7 @@ export const updateGame = (token: string, gameId: number, gamePayload: Game) => 
   } catch (error) {
     dispatch({
       type: GameActionTypes.GAME_ERROR,
-      error: error?.response?.data?.message,
+      error: error?.response?.data?.message || 'Cannot update game',
     });
   }
 };
@@ -87,7 +87,7 @@ export const getGame = (token: string, gameId: number) => async (dispatch: Dispa
   } catch (error) {
     dispatch({
       type: GameActionTypes.GAME_ERROR,
-      error: error?.response?.data?.message,
+      error: error?.response?.data?.message || 'Cannot get game',
     });
   }
 }
@@ -114,7 +114,7 @@ export const getCurrentGames = (token: string) => async (dispatch: Dispatch) => 
   } catch (error) {
     dispatch({
       type: GameActionTypes.GAME_ERROR,
-      error: error?.response?.data?.message,
+      error: error?.response?.data?.message || 'Cannot get user games',
     });
   }
 };
@@ -142,11 +142,11 @@ export const addGameMove = (token: string, gameMovePayload: GameMove) => async (
   } catch (error) {
     dispatch({
       type: GameActionTypes.GAME_ERROR,
-      error: error?.response?.data?.message,
+      error: error?.response?.data?.message || 'Cannot add game move',
     });
   }
 };
-      
+
 export const updateGamesStatus = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
@@ -169,7 +169,7 @@ export const updateGamesStatus = (token: string) => async (dispatch: Dispatch) =
   } catch (error) {
     dispatch({
       type: GameActionTypes.GAME_ERROR,
-      error: error?.response?.data?.message,
+      error: error?.response?.data?.message || 'Cannot update games status',
     });
   }
 };
