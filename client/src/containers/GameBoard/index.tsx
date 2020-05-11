@@ -106,7 +106,7 @@ class GameBoard extends React.Component<BProps, BState> {
     this.interval = setInterval(() => {
       const game = this.props?.game?.game;
       const currentUser = this.props?.currentUser?.currentUser;
-      const gameId = game.id;
+      const gameId = game?.id;
       const token = currentUser?.token;
       if (gameId && token) {
         this.props.getGame(token, gameId);
