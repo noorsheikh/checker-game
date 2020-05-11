@@ -31,7 +31,7 @@ export const login = (username: string, password: string) => async (dispatch: Di
   } catch (error) {
     dispatch({
       type: LoginActions.LOGIN_ERROR,
-      error: error?.response?.data?.message,
+      error: error?.response?.data?.message || 'Authentication Denied',
     });
   }
 };

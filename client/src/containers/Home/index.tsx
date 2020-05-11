@@ -43,16 +43,25 @@ class Home extends React.Component<HProps, HState> {
     gameMoves: [] as Game['gameMoves']
   }
 
+  interval: any;
+
   componentDidMount() {
-    const currentUser = this.props?.currentUser?.currentUser;
-    if (currentUser) {
-      const { token } = currentUser;
-      this.props.updateGamesStatus(token);
-      this.props.getCurrentGames(token);
-      if (this.props?.currentGames?.games?.length > 0) {
-        this.setState({ joinGame: this.getCurrentGameToJoin() }, () => this.state?.joinGame);
+    this.interval = setInterval(() => {
+      const currentUser = this.props?.currentUser?.currentUser;
+      if (currentUser) {
+        const { token } = currentUser;
+        this.props.updateGamesStatus(token);
+        this.props.getCurrentGames(token);
+        if (this.props?.currentGames?.games?.length > 0) {
+          this.setState({ joinGame: this.getCurrentGameToJoin() }, () => this.state?.joinGame);
+          this.setState({ currentGames: this.props?.currentGames})
+        }
       }
-    }
+    }, 3000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   startGame = (e: any) => {
@@ -72,7 +81,7 @@ class Home extends React.Component<HProps, HState> {
 
   viewMoves = (gameId: number | undefined) => {
     if(gameId) {
-      let finishedGames = this.filterFinishedGames(this.props?.currentGames?.games);
+      let finishedGames = this.filterFinishedGames(this.state.currentGames?.games);
       let game = finishedGames.filter(game => {
         return game.id === gameId;
       })[0];
@@ -98,7 +107,7 @@ class Home extends React.Component<HProps, HState> {
   }
 
   getCurrentGameToJoin = () => {
-    const games = this.props?.currentGames?.games;
+    const games = this.state.currentGames?.games;
     const currentUserId = this.props?.currentUser?.currentUser?.id;
     return games?.filter(game => {
       return game.gameStatus === 'not-started' &&
@@ -124,7 +133,7 @@ class Home extends React.Component<HProps, HState> {
 
     const joinGame = this.state?.joinGame;
 
-    const games = this.props?.currentGames?.games;
+    const games = this.state.currentGames?.games;
     let currentGames: Game[] = [];
     let finishedGames: Game[] = [];
     if (games?.length > 0) {
