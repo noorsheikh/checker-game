@@ -262,4 +262,21 @@ class GameController extends BaseController
 
     return true;
   }
+
+  /**
+   * @Route("/update-games-status", name="update_games_status", methods={"GET"})
+   */
+  public function updateGamesStatus(): JsonResponse
+  {
+    $currentDate = new \DateTimeImmutable();
+    $this->getDoctrine()
+      ->getRepository(Game::class)
+      ->updateGamesStatus($currentDate);
+
+    $this->getDoctrine()
+      ->getRepository(Game::class)
+      ->deleteGames($currentDate);
+
+    return $this->json([ 'message' => 'Games successfully updated ']);
+  }
 }
