@@ -102,6 +102,9 @@ class GameBoard extends React.Component<BProps, BState> {
     },
   ];
 
+  player1score: number = 0;
+  player2score: number = 0;
+
   interval: any;
 
   componentDidMount() {
@@ -121,6 +124,8 @@ class GameBoard extends React.Component<BProps, BState> {
               lockPlayer: game.playerTurn === 1 ? 2 : 1,
               updatingServer: false
             });
+            this.player1score = game.player1Score || 0;
+            this.player2score = game.player2Score || 0;
           }
         } else {
           // Update client game board state if it is different than server game board state
@@ -133,6 +138,8 @@ class GameBoard extends React.Component<BProps, BState> {
               alert: "",
               updatingServer: true
             });
+            this.player1score = game.player1Score || 0;
+            this.player2score = game.player2Score || 0;
           } else {
             this.setState({ updatingServer: false });
           }
@@ -221,8 +228,8 @@ class GameBoard extends React.Component<BProps, BState> {
     // if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
     const boardState = this.state.game?.game?.boardState || [];
     const boardValue = boardState[position?.row][position?.column];
-    let player1score = this.state.game?.game?.player1Score || 0;
-    let player2score = this.state.game?.game?.player2Score || 0;
+    let player1score = this.player1score;
+    let player2score = this.player2score;
     if (boardValue === 1 || boardValue === 3) player2score++;
     else if (boardValue === 2 || boardValue === 4) player1score++;
     boardState[position?.row][position?.column] = 0;
@@ -325,7 +332,7 @@ class GameBoard extends React.Component<BProps, BState> {
   };
 
   updateGameBoard = (boardState: number[][]) => {
-    this.updateGameBoardAndPlayerScores(boardState, this.state.game?.game?.player1Score || 0, this.state.game?.game?.player2Score || 0);
+    this.updateGameBoardAndPlayerScores(boardState, this.player1score, this.player2score);
   }
 
   checkIfWinner(player1score: number, player2score: number) {
@@ -334,10 +341,10 @@ class GameBoard extends React.Component<BProps, BState> {
     const player1Id = this.state.game?.game?.player1?.id;
     const player2Id = this.state.game?.game?.player2?.id;
     let winner = false;
-    if (player1score === 12) {
+    if (player1score >= 12) {
       this.props.updateGame(token, gameId, { winnerId: player1Id, gameStatus: 'completed' });
       winner = true;
-    } else if (player2score === 12) {
+    } else if (player2score >= 12) {
       this.props.updateGame(token, gameId, { winnerId: player2Id, gameStatus: 'completed' });
       winner = true;
     }
@@ -349,7 +356,9 @@ class GameBoard extends React.Component<BProps, BState> {
   }
 
   updateGameBoardAndPlayerScores = (boardState: number[][], player1Score: number, player2Score: number) => {
-    this.setState({ player1score: player1Score, player2score: player2Score, boardState, updatingServer: true });
+    this.setState({ boardState, updatingServer: true });
+    this.player1score = player1Score;
+    this.player2score = player2Score;
 
     this.checkIfWinner(player1Score, player2Score);
 
@@ -613,9 +622,9 @@ class GameBoard extends React.Component<BProps, BState> {
                         playerTurn={game?.playerTurn ? game?.playerTurn : 0}
                         player1={game?.player1?.id ? `${game?.player1?.username}` : 'Player 1'}
                         player2={game?.player2?.id ? `${game?.player2?.username}` : 'Player 2'}
-                        player1score={game.player1Score || 0}
-                        player2score={game.player2Score || 0}
-                        winner={game?.winner ? `${game?.winner?.firstName} ${game?.winner?.lastName}` : ''}
+                        player1score={this.player1score}
+                        player2score={this.player2score}
+                        winner={game?.winner ? `${game?.winner?.username}` : ''}
                         alert={alert}
                       />
                     </Col>
