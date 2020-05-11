@@ -1,4 +1,4 @@
-import { Game } from '../../models';
+import { Game, GameMove } from '../../models';
 import { GameActionTypes } from '../../actions/game';
 import { AnyAction } from 'redux';
 
@@ -11,6 +11,12 @@ export interface GameState {
 export interface GamesState {
   pending: boolean;
   games: Game[];
+  error: string[];
+}
+
+export interface GameMovesState {
+  pending: boolean;
+  gameMoves: GameMove[];
   error: string[];
 }
 

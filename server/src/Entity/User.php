@@ -76,9 +76,15 @@ class User implements UserInterface
    */
   private $game;
 
+  /**
+   * @ORM\OneToMany(targetEntity="Checker\Entity\GameMove", mappedBy="player")
+   */
+  private $gameMoves;
+
   public function __construct()
   {
       $this->game = new ArrayCollection();
+      $this->gameMoves = new ArrayCollection();
   }
 
   /**
@@ -293,5 +299,36 @@ class User implements UserInterface
   public function getSalt()
   {
     return null;
+  }
+
+  /**
+   * @return Collection|GameMove[]
+   */
+  public function getGameMoves(): Collection
+  {
+      return $this->gameMoves;
+  }
+
+  public function addGameMove(GameMove $gameMove): self
+  {
+      if (!$this->gameMoves->contains($gameMove)) {
+          $this->gameMoves[] = $gameMove;
+          $gameMove->setPlayer($this);
+      }
+
+      return $this;
+  }
+
+  public function removeGameMove(GameMove $gameMove): self
+  {
+      if ($this->gameMoves->contains($gameMove)) {
+          $this->gameMoves->removeElement($gameMove);
+          // set the owning side to null (unless already changed)
+          if ($gameMove->getPlayer() === $this) {
+              $gameMove->setPlayer(null);
+          }
+      }
+
+      return $this;
   }
 }

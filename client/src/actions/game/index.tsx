@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Dispatch } from 'redux';
-import { Game } from '../../models';
+import { Game, GameMove } from '../../models';
 import { authHttpFlag, host, authHttpPort, authHttpsPort } from '../../utils';
 
 export enum GameActionTypes {
@@ -119,6 +119,34 @@ export const getCurrentGames = (token: string) => async (dispatch: Dispatch) => 
   }
 };
 
+export const addGameMove = (token: string, gameMovePayload: GameMove) => async (dispatch: Dispatch) => {
+  dispatch({ type: GameActionTypes.GAME_PENDING });
+  try {
+    const http = authHttpFlag === '1' ? 'http' : 'https';
+    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
+    const url = http + '://' + host + ':' + port + `/api/secure/game-move/add`;
+    const gameMove = await axios.post(
+      url,
+      gameMovePayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    dispatch({
+      type: GameActionTypes.GAME_SUCCESS,
+      payload: gameMove?.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GameActionTypes.GAME_ERROR,
+      error: error?.response?.data?.message,
+    });
+  }
+};
+      
 export const updateGamesStatus = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {

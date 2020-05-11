@@ -4,6 +4,7 @@ namespace Checker\Controller;
 
 use Checker\Entity\Game;
 use Checker\Entity\User;
+use Checker\Entity\GameMove;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -230,6 +231,26 @@ class GameController extends BaseController
       ];
     }
 
+    $gameMovesResponse = [];
+    $gameMoves = $game->getGameMoves();
+    foreach ($gameMoves as $move) {
+      if ($move instanceof GameMove) {
+        array_push($gameMovesResponse, [
+          'id' => $move->getId(),
+          'game' => $move->getGame()->getId(),
+          'player' => [
+            'id' => $move->getPlayer()->getId(),
+            'firstName' => $move->getPlayer()->getFirstName(),
+            'lastName' => $move->getPlayer()->getLastName(),
+            'username' => $move->getPlayer()->getUsername(),
+          ],
+          'boardState' => $move->getBoardState(),
+          'timestamp' => $move->getTimestamp(),
+        ]);
+      }
+    }
+    $response['gameMoves'] = $gameMovesResponse;
+
     return $response;
   }
 
@@ -248,6 +269,64 @@ class GameController extends BaseController
     }
 
     return $this->json($response);
+  }
+
+  /**
+   * @Route("/game-move/add", name="add_game_move")
+   */
+  public function addGameMove(Request $request): JsonResponse
+  {
+    $requestData = json_decode($request->getContent(), true);
+
+    $errors = [];
+
+    $gameMove = new GameMove();
+
+    $gameId = $requestData['gameId'] ?? '';
+    if (!$gameId || !is_numeric($gameId)) {
+      $errors[] = 'Invalid game id provided';
+    }
+
+    if ($gameId && is_numeric($gameId)) {
+      $game = $this->getDoctrine()->getRepository(Game::class)->find($gameId);
+      if ($game instanceof Game) {
+        $gameMove->setGame($game);
+      } else {
+        $errors[] = 'Game not found for given id';
+      }
+    }
+
+    $playerId = $requestData['playerId'] ?? '';
+    if ($playerId && is_numeric($playerId)) {
+      $player = $this->getDoctrine()->getRepository(User::class)->find($playerId);
+      if ($player instanceof User) {
+        $gameMove->setPlayer($player);
+      } else {
+        $errors[] = 'Player not found for game move';
+      }
+    }
+
+    $boardState = isset($requestData['boardState']) &&  is_array($requestData['boardState']) ? $requestData['boardState'] : '';
+    if ($boardState && !$this->isBoardStateValid($boardState)) {
+      $errors[] = 'Invalid board state';
+    }
+
+    if ($boardState && $this->isBoardStateValid($boardState)) {
+      $gameMove->setBoardState(json_encode($boardState));
+    }
+
+    $gameMove->setTimestamp(new \DateTimeImmutable());
+
+    if (count($errors) > 0) {
+      return $this->json([ 'message' =>  $errors ], 416);
+    }
+
+    $this->getDoctrine()->getManager()->persist($gameMove);
+    $this->getDoctrine()->getManager()->flush();
+
+    $game = $this->getDoctrine()->getRepository(Game::class)->find($gameId);
+
+    return $this->json($this->buildResponse($game));
   }
 
   private function isBoardStateValid(array $boardState): bool
