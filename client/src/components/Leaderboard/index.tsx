@@ -23,7 +23,7 @@ class Leaderboard extends React.Component<LProps, LState> {
   }
 
   render() {
-   const leaderboard = this.props?.leaderboard?.leaderboard;
+    const leaderboard = this.props?.leaderboard?.leaderboard;
 
     return (
       <React.Fragment>
