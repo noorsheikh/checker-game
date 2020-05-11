@@ -129,8 +129,12 @@ class GameBoard extends React.Component<BProps, BState> {
           {
             this.setState({
               game: this.props?.game,
-              lockPlayer: game.playerTurn === 1 ? 2 : 1
+              lockPlayer: game.playerTurn === 1 ? 2 : 1,
+              alert: "",
+              updatingServer: true
             });
+          } else {
+            this.setState({ updatingServer: false });
           }
         }
       }
@@ -321,7 +325,7 @@ class GameBoard extends React.Component<BProps, BState> {
   };
 
   updateGameBoard = (boardState: number[][]) => {
-    this.updateGameBoardAndPlayerScores(boardState, this.state.player1score, this.state.player2score);
+    this.updateGameBoardAndPlayerScores(boardState, this.state.game?.game?.player1Score || 0, this.state.game?.game?.player2Score || 0);
   }
 
   checkIfWinner(player1score: number, player2score: number) {
@@ -428,7 +432,7 @@ class GameBoard extends React.Component<BProps, BState> {
       }
     }
     else {
-      if (this.state.winner.length > 0) {
+      if (this.state.game?.game?.winner) {
         this.updateAlertState("The game is over.");
       } else {
         if (Object.keys(this.state.selectedPiece).length !== 0) {
@@ -493,10 +497,10 @@ class GameBoard extends React.Component<BProps, BState> {
       }
     }
     else {
-      if (this.state.winner.length > 0) {
+      if (this.state.game?.game?.winner) {
         this.updateAlertState("The game is over.");
       }
-      else if (playerTurn !== player) {
+      else {
         this.updateAlertState("It is not your turn.");
       }
     }
