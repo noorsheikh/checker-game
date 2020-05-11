@@ -1,6 +1,3 @@
--- create checker_game database
-CREATE DATABASE `checker_game`;
-
 -- use checker_game database
 USE `checker_game`;
 
@@ -55,13 +52,14 @@ CREATE TABLE `game_move` (
   CONSTRAINT `FK_42B5B54E48FD905` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- delete mysql root password
-DELETE FROM mysql.user WHERE User='root';
-FLUSH PRIVILEGES;
+-- insert test users
+INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `password`)
+VALUES
+	(1,'Manish','Kumar','manish','manish@gmail.com','$argon2i$v=19$m=65536,t=4,p=1$MFQ3dTBwVDA2ZmR2Sy5raA$NWlXtpkKri+Q6tjsYk75XJ2tZjLeRu+Zyg5hgengOk0'),
+	(2,'Brandon','Amour','brandon','brandon@gmail.com','$argon2i$v=19$m=65536,t=4,p=1$eTZNLlJ3QTJ2eGJIbUVyRw$6BeJw4iKXH9tL7QehUClNK4EwjUMG/G5T8BRYKvv5CU'),
+	(3,'Noor','Sheikh','noorsheikh','noorsheikh@gmail.com','$argon2i$v=19$m=65536,t=4,p=1$UTVJUzdXV0JzUm1VTGZsTA$izC3zkkceXOl2iq3Ahz59ZE+E5upnXL15z8cgizeQCs');
 
--- create new limited privileged mysql user with password and grant privileges
-CREATE USER `cg-user`@`localhost` IDENTIFIED BY 'P@$$word@@.123';
-GRANT ALL ON *.* TO 'cg-user'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON `checker_game`.* TO `cg-user`@`localhost`;
-GRANT DELETE ON `checker_game`.`game` TO `cg-user`@`localhost`;
+-- restrict root user's privileges
+GRANT SELECT, INSERT, UPDATE ON `checker_game`.* TO `root`@`localhost`;
+GRANT DELETE ON `checker_game`.`game` TO `root`@`localhost`;
 FLUSH PRIVILEGES;
