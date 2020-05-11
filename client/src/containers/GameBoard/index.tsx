@@ -40,7 +40,7 @@ interface BState {
   game: GameState;
   winner: string;
   locked: boolean;
-  lockPlayer: boolean;
+  lockPlayer: number;
 }
 
 class GameBoard extends React.Component<BProps, BState> {
@@ -85,7 +85,7 @@ class GameBoard extends React.Component<BProps, BState> {
     winner: "",
     locked: false,
     game: {} as GameState,
-    lockPlayer: false,
+    lockPlayer: 0,
   };
 
   pieces = [
@@ -104,10 +104,18 @@ class GameBoard extends React.Component<BProps, BState> {
 
   componentDidMount() {
     this.interval = setInterval(() => {
-      const gameId = this.props?.game?.game?.id;
-      const token = this.props?.currentUser?.currentUser?.token;
-      if (token && gameId) {
+      const game = this.props?.game?.game;
+      const currentUser = this.props?.currentUser?.currentUser;
+      const gameId = game.id;
+      const token = currentUser?.token;
+      if (gameId && token) {
         this.props.getGame(token, gameId);
+        if (JSON.stringify(this.state.boardState) !== JSON.stringify(game?.boardState)) {
+          this.setState({
+            boardState: this.props?.game?.game.boardState || [],
+            lockPlayer: game.playerTurn === 1 ? 2 : 1
+          });
+        }
       }
     }, 5000);
   }
@@ -153,7 +161,7 @@ class GameBoard extends React.Component<BProps, BState> {
       playerTurn: playerTurn === 1 ? 2 : 1,
     };
     this.props.updateGame(token, id, updateGamePayload);
-    this.setState({ lockPlayer: true });
+    this.setState({ lockPlayer: playerTurn || 0 });
   };
 
   movePiece = (tilePosition: any) => {
@@ -240,7 +248,7 @@ class GameBoard extends React.Component<BProps, BState> {
 
   canOpponentJump = (piece: any, newPosition: any) => {
     const pieces = this.pieces;
-    const boardState = this.props?.game?.game?.boardState || [];
+    const boardState = this.state.boardState;
     if (piece) {
       //find what the displacement is
       const dx = newPosition?.column - piece?.position?.column;
@@ -320,7 +328,7 @@ class GameBoard extends React.Component<BProps, BState> {
   }
 
   updateGameBoardAndPlayerScores = (boardState: number[][], player1Score: number, player2Score: number) => {
-    this.setState({ player1score: player1Score, player2score: player2Score });
+    this.setState({ player1score: player1Score, player2score: player2Score, boardState });
 
     this.checkIfWinner(player1Score, player2Score);
 
@@ -418,7 +426,7 @@ class GameBoard extends React.Component<BProps, BState> {
   onPieceClick = (player: any, position: any, king: any) => {
     // if (DEBUG) console.log('onPieceClick:' + JSON.stringify({ player, position, king }));
     const { playerTurn, gameLocked } = this.props?.game?.game;
-    if (playerTurn === player && gameLocked === 0 && this.playerTurnMatchesCurrentPlayer()) {
+    if (playerTurn === player && gameLocked === 0 && this.playerTurnMatchesCurrentPlayer() && this.state.lockPlayer !== playerTurn) {
       const piecesThatCanJump = [];
       for (let row = 0; row < 8; row++) {
         for (let column = 0; column < 8; column++) {
@@ -482,12 +490,13 @@ class GameBoard extends React.Component<BProps, BState> {
     const pieces = [];
     const currentUser = this.props?.currentUser?.currentUser;
     const game = this.props?.game?.game;
+    const boardState = this.state.boardState;
 
     if (!currentUser?.isLoggedIn) {
       return <Redirect to="/" />;
     }
 
-    if (game?.boardState) {
+    if (boardState) {
       for (let row = 0; row < 8; row++) {
         const oddRow = row % 2 !== 0 ? true : false;
         for (let column = 0; column < 8; column++) {
@@ -524,14 +533,14 @@ class GameBoard extends React.Component<BProps, BState> {
           if (validTile) {
             tiles.push(<Tile key={tileID} position={position} handleClick={this.onTileClick} style={style} />);
 
-            if (game.boardState[row][column] !== 0) {
+            if (boardState[row][column] !== 0) {
               let player = 1;
               let king = false;
-              if (game.boardState[row][column] === 2) {
+              if (boardState[row][column] === 2) {
                 player = 2;
-              } else if (game.boardState[row][column] === 3) {
+              } else if (boardState[row][column] === 3) {
                 king = true;
-              } else if (game.boardState[row][column] === 4) {
+              } else if (boardState[row][column] === 4) {
                 player = 2;
                 king = true;
               }
