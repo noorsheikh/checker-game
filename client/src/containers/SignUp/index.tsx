@@ -76,7 +76,7 @@ class SignUp extends React.Component<SIProps, SIState> {
                 <Alert.Heading>Registration Failed</Alert.Heading>
                 <ul>
                   {register?.error?.map((error) => (
-                    <li>{error}</li>
+                    <li key={register?.error?.indexOf(error)}>{error}</li>
                   ))}
                 </ul>
               </Alert>
