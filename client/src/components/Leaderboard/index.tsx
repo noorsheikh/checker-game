@@ -40,7 +40,7 @@ class Leaderboard extends React.Component<LProps, LState> {
             data={leaderboard}
             title="Leaderboard"
             options={{
-              pageSize: 10,
+              pageSize: 5,
               search: false
             }}
           />

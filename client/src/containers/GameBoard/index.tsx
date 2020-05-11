@@ -583,6 +583,9 @@ class GameBoard extends React.Component<BProps, BState> {
     }
 
     let alert: string = !game?.player2 ? "Waiting for second player to join." : this.state.alert;
+    if (this.state.updatingServer) {
+      alert = "Updating game state...";
+    }
 
     return (
       <React.Fragment>
