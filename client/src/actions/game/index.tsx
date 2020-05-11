@@ -146,3 +146,30 @@ export const addGameMove = (token: string, gameMovePayload: GameMove) => async (
     });
   }
 };
+      
+export const updateGamesStatus = (token: string) => async (dispatch: Dispatch) => {
+  dispatch({ type: GameActionTypes.GAME_PENDING });
+  try {
+    const http = authHttpFlag === '1' ? 'http' : 'https';
+    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
+    const url = http + '://' + host + ':' + port + `/api/secure/update-games-status`;
+    const currentGames = await axios.get(
+      url,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    dispatch({
+      type: GameActionTypes.GAME_SUCCESS,
+      payload: currentGames?.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GameActionTypes.GAME_ERROR,
+      error: error?.response?.data?.message,
+    });
+  }
+};

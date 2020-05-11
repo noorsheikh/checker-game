@@ -6,7 +6,7 @@ import Header from '../../components/Header';
 import { Container, Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 import MaterialTable from "material-table";
-import { createGame, getCurrentGames } from '../../actions/game';
+import { createGame, getCurrentGames, updateGamesStatus } from '../../actions/game';
 import { GameState, GamesState } from '../../reducers/game';
 import Leaderboard from '../../components/Leaderboard';
 import { updateGame } from '../../actions/game';
@@ -21,6 +21,7 @@ interface HProps {
   currentGames: GamesState;
   getFinishedGames: Function;
   updateGame: Function;
+  updateGamesStatus: Function;
 }
 
 interface HState {
@@ -46,6 +47,7 @@ class Home extends React.Component<HProps, HState> {
     const currentUser = this.props?.currentUser?.currentUser;
     if (currentUser) {
       const { token } = currentUser;
+      this.props.updateGamesStatus(token);
       this.props.getCurrentGames(token);
       if (this.props?.currentGames?.games?.length > 0) {
         this.setState({ joinGame: this.getCurrentGameToJoin() }, () => this.state?.joinGame);
@@ -269,4 +271,4 @@ const mapStateToProps = (state: HState) => ({
   currentGames: state.currentGames,
 });
 
-export default connect(mapStateToProps, { createGame, getCurrentGames, updateGame })(Home);
+export default connect(mapStateToProps, { createGame, getCurrentGames, updateGame, updateGamesStatus })(Home);
