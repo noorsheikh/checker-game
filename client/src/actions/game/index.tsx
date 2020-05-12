@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Dispatch } from 'redux';
 import { Game, GameMove } from '../../models';
-import { authHttpFlag, host, authHttpPort, authHttpsPort } from '../../utils';
+import { host } from '../../utils';
 
 export enum GameActionTypes {
   GAME_PENDING = 'GAME_PENDING',
@@ -12,9 +12,7 @@ export enum GameActionTypes {
 export const createGame = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
-    const http = authHttpFlag === '1' ? 'http' : 'https';
-    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + '/api/secure/game-board/create';
+    const url = 'https://' + host + ':443/api/secure/game-board/create';
     const game = await axios.post(
       url,
       {},
@@ -40,9 +38,7 @@ export const createGame = (token: string) => async (dispatch: Dispatch) => {
 export const updateGame = (token: string, gameId: number, gamePayload: Game) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
-    const http = authHttpFlag === '1' ? 'http' : 'https';
-    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + `/api/secure/game-board/update/${gameId}`;
+    const url = 'https://' + host + `:443/api/secure/game-board/update/${gameId}`;
     const game = await axios.post(
       url,
       gamePayload,
@@ -68,9 +64,7 @@ export const updateGame = (token: string, gameId: number, gamePayload: Game) => 
 export const getGame = (token: string, gameId: number) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
-    const http = authHttpFlag === '1' ? 'http' : 'https';
-    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + `/api/secure/game-board/${gameId}`;
+    const url = 'https://' + host + `:443/api/secure/game-board/${gameId}`;
     const game = await axios.get(
       url,
       {
@@ -95,9 +89,7 @@ export const getGame = (token: string, gameId: number) => async (dispatch: Dispa
 export const getCurrentGames = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
-    const http = authHttpFlag === '1' ? 'http' : 'https';
-    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + `/api/secure/current-games`;
+    const url = 'https://' + host + `:443/api/secure/current-games`;
     const currentGames = await axios.get(
       url,
       {
@@ -122,9 +114,7 @@ export const getCurrentGames = (token: string) => async (dispatch: Dispatch) => 
 export const addGameMove = (token: string, gameMovePayload: GameMove) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
-    const http = authHttpFlag === '1' ? 'http' : 'https';
-    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + `/api/secure/game-move/add`;
+    const url = 'https://' + host + `:443/api/secure/game-move/add`;
     const gameMove = await axios.post(
       url,
       gameMovePayload,
@@ -150,9 +140,7 @@ export const addGameMove = (token: string, gameMovePayload: GameMove) => async (
 export const updateGamesStatus = (token: string) => async (dispatch: Dispatch) => {
   dispatch({ type: GameActionTypes.GAME_PENDING });
   try {
-    const http = authHttpFlag === '1' ? 'http' : 'https';
-    const port = authHttpFlag === '1' ? authHttpPort : authHttpsPort;
-    const url = http + '://' + host + ':' + port + `/api/secure/update-games-status`;
+    const url = 'https://' + host + `:443/api/secure/update-games-status`;
     const currentGames = await axios.get(
       url,
       {
