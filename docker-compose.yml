@@ -39,7 +39,6 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - MYSQL_HOST=mysql
     ports:
-      - 80:80
       - 443:443
     depends_on:
       - mysql

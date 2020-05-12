@@ -40,6 +40,8 @@ interface BState {
   game: GameState;
   winner: string;
   locked: boolean;
+  lockPlayer: number;
+  updatingServer: boolean;
 }
 
 class GameBoard extends React.Component<BProps, BState> {
@@ -84,6 +86,8 @@ class GameBoard extends React.Component<BProps, BState> {
     winner: "",
     locked: false,
     game: {} as GameState,
+    lockPlayer: 0,
+    updatingServer: false
   };
 
   pieces = [
@@ -98,14 +102,50 @@ class GameBoard extends React.Component<BProps, BState> {
     },
   ];
 
+  player1score: number = 0;
+  player2score: number = 0;
+
   interval: any;
 
   componentDidMount() {
     this.interval = setInterval(() => {
-      const gameId = this.props?.game?.game?.id;
-      const token = this.props?.currentUser?.currentUser?.token;
-      this.props.getGame(token, gameId);
-    }, 5000);
+      const game =this.props?.game?.game;
+      const currentUser = this.props?.currentUser?.currentUser;
+      const gameId = game?.id;
+      const token = currentUser?.token;
+      if (gameId && token) {
+        this.props.getGame(token, gameId);
+        // If request has gone to server to update
+        if (this.state.updatingServer) {
+          // Update client game board state if server state has been updated to match latest move
+          if (JSON.stringify(this.state.game?.game?.boardState) === JSON.stringify(game?.boardState)) {
+            this.setState({
+              game: this.props?.game,
+              lockPlayer: game.playerTurn === 1 ? 2 : 1,
+              updatingServer: false
+            });
+            this.player1score = game.player1Score || 0;
+            this.player2score = game.player2Score || 0;
+          }
+        } else {
+          // Update client game board state if it is different than server game board state
+          if (JSON.stringify(this.state.game?.game?.boardState) !== JSON.stringify(game?.boardState) ||
+            this.state.game?.game?.player2Id !== game?.player2Id)
+          {
+            this.setState({
+              game: this.props?.game,
+              lockPlayer: game.playerTurn === 1 ? 2 : 1,
+              alert: "",
+              updatingServer: true
+            });
+            this.player1score = game.player1Score || 0;
+            this.player2score = game.player2Score || 0;
+          } else {
+            this.setState({ updatingServer: false });
+          }
+        }
+      }
+    }, 1000);
   }
 
   componentWillUnmount() {
@@ -113,7 +153,7 @@ class GameBoard extends React.Component<BProps, BState> {
   }
 
   isValidPlaceToMove = (tilePosition: any) => {
-    const boardState = this.props?.game?.game?.boardState || [];
+    const boardState = this.state.game?.game?.boardState || [];
     const row = tilePosition?.row;
     const column = tilePosition?.column;
     if (row < 0 || row > 7 || column < 0 || column > 7) return false;
@@ -122,7 +162,7 @@ class GameBoard extends React.Component<BProps, BState> {
   };
 
   makeKing = (position: any) => {
-    const boardState = this.props?.game?.game?.boardState || [];
+    const boardState = this.state.game?.game?.boardState || [];
     if (boardState[position?.row][position?.column] === 1) {
       boardState[position?.row][position?.column] = 3;
     } else if (boardState[position?.row][position?.column] === 2) {
@@ -144,17 +184,18 @@ class GameBoard extends React.Component<BProps, BState> {
     // this.setState({ playerTurn: this.state.playerTurn === 1 ? 2 : 1 });
 
     const { token } = this.props?.currentUser?.currentUser;
-    const { id, playerTurn } = this.props?.game?.game;
+    const { id, playerTurn } = this.state.game?.game;
     const updateGamePayload: Game = {
       playerTurn: playerTurn === 1 ? 2 : 1,
     };
     this.props.updateGame(token, id, updateGamePayload);
+    this.setState({ lockPlayer: playerTurn || 0 });
   };
 
   movePiece = (tilePosition: any) => {
     const selectedPiece: any = this.state.selectedPiece;
-    const boardState = this.props?.game?.game?.boardState || [];
-    const playerTurn = this.props?.game?.game?.playerTurn;
+    const boardState = this.state.game?.game?.boardState || [];
+    const playerTurn = this.state.game?.game?.playerTurn;
 
     if (selectedPiece) {
       if (selectedPiece?.player !== playerTurn) return;
@@ -185,10 +226,10 @@ class GameBoard extends React.Component<BProps, BState> {
 
   removePiece = (position: any) => {
     // if (DEBUG) console.log('removePiece:' + JSON.stringify(position));
-    const boardState = this.props.game?.game?.boardState || [];
+    const boardState = this.state.game?.game?.boardState || [];
     const boardValue = boardState[position?.row][position?.column];
-    let player1score = this.props.game?.game?.player1Score || 0;
-    let player2score = this.props.game?.game?.player2Score || 0;
+    let player1score = this.player1score;
+    let player2score = this.player2score;
     if (boardValue === 1 || boardValue === 3) player2score++;
     else if (boardValue === 2 || boardValue === 4) player1score++;
     boardState[position?.row][position?.column] = 0;
@@ -235,7 +276,7 @@ class GameBoard extends React.Component<BProps, BState> {
 
   canOpponentJump = (piece: any, newPosition: any) => {
     const pieces = this.pieces;
-    const boardState = this.props?.game?.game?.boardState || [];
+    const boardState = this.state.game?.game?.boardState || [];
     if (piece) {
       //find what the displacement is
       const dx = newPosition?.column - piece?.position?.column;
@@ -291,19 +332,19 @@ class GameBoard extends React.Component<BProps, BState> {
   };
 
   updateGameBoard = (boardState: number[][]) => {
-    this.updateGameBoardAndPlayerScores(boardState, this.state.player1score, this.state.player2score);
+    this.updateGameBoardAndPlayerScores(boardState, this.player1score, this.player2score);
   }
 
   checkIfWinner(player1score: number, player2score: number) {
     const token = this.props?.currentUser?.currentUser?.token;
-    const gameId = this.props?.game?.game?.id;
-    const player1Id = this.props?.game?.game?.player1?.id;
-    const player2Id = this.props?.game?.game?.player2?.id;
+    const gameId = this.state.game?.game?.id;
+    const player1Id = this.state.game?.game?.player1?.id;
+    const player2Id = this.state.game?.game?.player2?.id;
     let winner = false;
-    if (player1score === 12) {
+    if (player1score >= 12) {
       this.props.updateGame(token, gameId, { winnerId: player1Id, gameStatus: 'completed' });
       winner = true;
-    } else if (player2score === 12) {
+    } else if (player2score >= 12) {
       this.props.updateGame(token, gameId, { winnerId: player2Id, gameStatus: 'completed' });
       winner = true;
     }
@@ -315,12 +356,14 @@ class GameBoard extends React.Component<BProps, BState> {
   }
 
   updateGameBoardAndPlayerScores = (boardState: number[][], player1Score: number, player2Score: number) => {
-    this.setState({ player1score: player1Score, player2score: player2Score });
+    this.setState({ boardState, updatingServer: true });
+    this.player1score = player1Score;
+    this.player2score = player2Score;
 
     this.checkIfWinner(player1Score, player2Score);
 
     const { token } = this.props?.currentUser?.currentUser;
-    const { id, playerTurn, player1, player2 } = this.props?.game?.game;
+    const { id, playerTurn, player1, player2 } = this.state.game?.game;
     const updateGamePayload: Game = {
       boardState,
       player1Score,
@@ -340,14 +383,14 @@ class GameBoard extends React.Component<BProps, BState> {
   }
 
   boardValueMatchesPlayerTurn = (boardValue: number) => {
-    const playerTurn = this.props?.game?.game?.playerTurn;
+    const playerTurn = this.state.game?.game?.playerTurn;
     if ((boardValue === 1 || boardValue === 3) && playerTurn === 1) return true;
     else if ((boardValue === 2 || boardValue === 4) && playerTurn === 2) return true;
     return false;
   }
 
   playerTurnMatchesCurrentPlayer = () => {
-    const { playerTurn, player1, player2 } = this.props?.game?.game;
+    const { playerTurn, player1, player2 } = this.state.game?.game;
     const currentUser = this.props?.currentUser?.currentUser;
     if (playerTurn === 1 && player1?.id === currentUser.id) return true;
     else if (playerTurn === 2 && player2?.id === currentUser.id) return true;
@@ -363,7 +406,7 @@ class GameBoard extends React.Component<BProps, BState> {
         if (this.opponentJump(tilePosition)) {
           this.updateAlertState("");
           this.movePiece(tilePosition);
-          const boardState = this.props?.game?.game?.boardState || [];
+          const boardState = this.state.game?.game?.boardState || [];
           const value = boardState[tilePosition.row][tilePosition.column];
           let player = 1;
           let king = false;
@@ -398,7 +441,7 @@ class GameBoard extends React.Component<BProps, BState> {
       }
     }
     else {
-      if (this.state.winner.length > 0) {
+      if (this.state.game?.game?.winner) {
         this.updateAlertState("The game is over.");
       } else {
         if (Object.keys(this.state.selectedPiece).length !== 0) {
@@ -412,12 +455,12 @@ class GameBoard extends React.Component<BProps, BState> {
 
   onPieceClick = (player: any, position: any, king: any) => {
     // if (DEBUG) console.log('onPieceClick:' + JSON.stringify({ player, position, king }));
-    const { playerTurn, gameLocked } = this.props?.game?.game;
-    if (playerTurn === player && gameLocked === 0 && this.playerTurnMatchesCurrentPlayer()) {
+    const { playerTurn, gameLocked } = this.state.game?.game;
+    if (playerTurn === player && gameLocked === 0 && this.playerTurnMatchesCurrentPlayer() && this.state.lockPlayer !== playerTurn) {
       const piecesThatCanJump = [];
       for (let row = 0; row < 8; row++) {
         for (let column = 0; column < 8; column++) {
-          const boardState = this.props?.game?.game?.boardState || [];
+          const boardState = this.state.game?.game?.boardState || [];
           const boardValue = boardState[row][column];
           if (boardValue !== 0) {
             let boardPlayer = 1;
@@ -463,10 +506,10 @@ class GameBoard extends React.Component<BProps, BState> {
       }
     }
     else {
-      if (this.state.winner.length > 0) {
+      if (this.state.game?.game?.winner) {
         this.updateAlertState("The game is over.");
       }
-      else if (playerTurn !== player) {
+      else {
         this.updateAlertState("It is not your turn.");
       }
     }
@@ -476,13 +519,14 @@ class GameBoard extends React.Component<BProps, BState> {
     const tiles = [];
     const pieces = [];
     const currentUser = this.props?.currentUser?.currentUser;
-    const game = this.props?.game?.game;
+    const game = this.state.game?.game;
+    const boardState = this.state.game?.game?.boardState;
 
     if (!currentUser?.isLoggedIn) {
       return <Redirect to="/" />;
     }
 
-    if (game?.boardState) {
+    if (boardState) {
       for (let row = 0; row < 8; row++) {
         const oddRow = row % 2 !== 0 ? true : false;
         for (let column = 0; column < 8; column++) {
@@ -519,14 +563,14 @@ class GameBoard extends React.Component<BProps, BState> {
           if (validTile) {
             tiles.push(<Tile key={tileID} position={position} handleClick={this.onTileClick} style={style} />);
 
-            if (game.boardState[row][column] !== 0) {
+            if (boardState[row][column] !== 0) {
               let player = 1;
               let king = false;
-              if (game.boardState[row][column] === 2) {
+              if (boardState[row][column] === 2) {
                 player = 2;
-              } else if (game.boardState[row][column] === 3) {
+              } else if (boardState[row][column] === 3) {
                 king = true;
-              } else if (game.boardState[row][column] === 4) {
+              } else if (boardState[row][column] === 4) {
                 player = 2;
                 king = true;
               }
@@ -552,6 +596,9 @@ class GameBoard extends React.Component<BProps, BState> {
     }
 
     let alert: string = !game?.player2 ? "Waiting for second player to join." : this.state.alert;
+    if (this.state.updatingServer) {
+      alert = "Updating game state...";
+    }
 
     return (
       <React.Fragment>
@@ -575,9 +622,9 @@ class GameBoard extends React.Component<BProps, BState> {
                         playerTurn={game?.playerTurn ? game?.playerTurn : 0}
                         player1={game?.player1?.id ? `${game?.player1?.username}` : 'Player 1'}
                         player2={game?.player2?.id ? `${game?.player2?.username}` : 'Player 2'}
-                        player1score={game.player1Score || 0}
-                        player2score={game.player2Score || 0}
-                        winner={game?.winner ? `${game?.winner?.firstName} ${game?.winner?.lastName}` : ''}
+                        player1score={this.player1score}
+                        player2score={this.player2score}
+                        winner={game?.winner ? `${game?.winner?.username}` : ''}
                         alert={alert}
                       />
                     </Col>

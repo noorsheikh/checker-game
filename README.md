@@ -61,9 +61,20 @@ Open Virtual Box default vm settings. Select Network tab, Port Forwarding and th
 
 
 ## Backend Endpoints
-Base Url: http://localhost:80
+Base Url: http://localhost:80 (Disabled but available)
 HTTPs Url: https://localhost:443
 | Endpoint URI        | Method           | Description  |
 | ------------- |-------------| -----|
 | /api/login      | POST | This endpoint is used for user login |
 | /api/user/register      | POST      |   This endpoint is used for registering new user |
+| /api/login  |
+| /api/secure/game-board/create |
+| /api/secure/game-board/update/{id} |
+| /api/secure/game-board/{id} |
+| /api/secure/current-games |
+| /api/secure/game-move/add |
+| /api/secure/update-games-status |
+| /api/user/register |
+| /api/secure/leaderboard |
+| /api/login_check |
+

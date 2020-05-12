@@ -23,7 +23,7 @@ class Leaderboard extends React.Component<LProps, LState> {
   }
 
   render() {
-   const leaderboard = this.props?.leaderboard?.leaderboard;
+    const leaderboard = this.props?.leaderboard?.leaderboard;
 
     return (
       <React.Fragment>
@@ -40,7 +40,7 @@ class Leaderboard extends React.Component<LProps, LState> {
             data={leaderboard}
             title="Leaderboard"
             options={{
-              pageSize: 10,
+              pageSize: 5,
               search: false
             }}
           />

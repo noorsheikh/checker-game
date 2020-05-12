@@ -331,7 +331,15 @@ class GameController extends BaseController
 
   private function isBoardStateValid(array $boardState): bool
   {
+    if (count($boardState) !== 8) {
+      return false;
+    }
+
     foreach($boardState as $row) {
+      if (count($row) !== 8) {
+        return false;
+      }
+
       foreach ($row as $rowItem) {
         if (!is_numeric($rowItem) || !in_array($rowItem, [0, 1, 2, 3, 4])) {
           return false;
