@@ -10,3 +10,4 @@ client/client.crt
 client/client.key
 client/.env
 .idea
+database/.env
